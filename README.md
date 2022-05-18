@@ -16,8 +16,8 @@ These procies have a JSON REST-API:
 ### General usage
 - address: http://v2202109132150164038.luckysrv.de:8080/
 - Input JSON 
- + type: search|hitlist
- + engine: entscheidsuche|swisscovery|boris|zora
+ -- type: search|hitlist
+ -- engine: entscheidsuche|swisscovery|boris|zora
 - Output JSON
  + status: ok|error
  + error: Error message (only present if status=error
