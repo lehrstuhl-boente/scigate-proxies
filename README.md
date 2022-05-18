@@ -26,18 +26,18 @@ These procies have a JSON REST-API:
 (Only additional parameters described here)
 
 - Input JSON
- - term: search term or search terms, no syntax translation is currently done for the search engines
+   - term: search term or search terms, no syntax translation is currently done for the search engines
 - Output JSON
- - hits: number of hits for the search
+   - hits: number of hits for the search
 
 ### type=hitlist
 (Only additional parameters described here)
 
 - Input JSON
- - term: search term or search terms, no syntax translation is currently done for the search engines
- - start: position in the hitlist to start (default=0)
- - count: number of hits to fetch (default=10). Not all search engines support more than 10 hits
+   - term: search term or search terms, no syntax translation is currently done for the search engines
+   - start: position in the hitlist to start (default=0)
+   - count: number of hits to fetch (default=10). Not all search engines support more than 10 hits
 - Output JSON
- - hitlist: list of hits every hit has the following attributes
-  - description: list of 3 string describing the hit. As markup can be included <span>-Tags with the classes hl1 and hl2 for bold and italic.
-  - url: URL to the hit at the search engine. Can be opened without context and should be opened in a new tab
+   - hitlist: list of hits every hit has the following attributes
+      - description: list of 3 string describing the hit. As markup can be included <span>-Tags with the classes hl1 and hl2 for bold and italic.
+      - url: URL to the hit at the search engine. Can be opened without context and should be opened in a new tab
