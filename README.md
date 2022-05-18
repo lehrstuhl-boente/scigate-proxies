@@ -39,5 +39,5 @@ These procies have a JSON REST-API:
    - count: number of hits to fetch (default=10). Not all search engines support more than 10 hits
 - Output JSON
    - hitlist: list of hits every hit has the following attributes
-      - description: list of 3 string describing the hit. As markup can be included <span>-Tags with the classes hl1 and hl2 for bold and italic.
+      - description: list of 3 strings describing the hit. As markup can be included <span>-Tags with the classes hl1 and hl2 for bold and italic.
       - url: URL to the hit at the search engine. Can be opened without context and should be opened in a new tab
