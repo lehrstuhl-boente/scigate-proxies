@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>6 Crossrecherche</title>
+    <script>
+    	function sendjson(data){
+			// Sending and receiving data in JSON format using POST method
+			//
+			var xhr = new XMLHttpRequest();
+			var url = document.URL;
+			xhr.open("POST", url, true);
+			xhr.setRequestHeader("Content-Type", "application/json");
+			xhr.send(data);
+			xhr.onreadystatechange = function () {
+				document.getElementById("status").innerHTML=xhr.status;
+    			if (xhr.readyState === 4 && xhr.status === 200) {
+        			document.getElementById("result").innerHTML=xhr.responseText;
+				}
+				else {
+        			document.getElementById("result").innerHTML="";
+				}
+			}
+    	}
+
+		function search(){
+			var engine=document.querySelector('input[name="engine"]:checked').value;
+			var data = JSON.stringify({"type": "search", "term": document.getElementById("term1").value, "engine": engine});
+			document.getElementById("body").innerHTML=data;
+			sendjson(data);
+		}
+
+		function hits(){
+			var engine=document.querySelector('input[name="engine"]:checked').value;
+			var data = JSON.stringify({"type": "hitlist", "term": document.getElementById("term2").value, "start": document.getElementById("start2").value, "count": document.getElementById("count2").value, "engine": engine});
+			document.getElementById("body").innerHTML=data;
+			sendjson(data);
+		}
+
+    </script>
+  </head>
+  <body>
+  	<h3>API for searching in legal databases</h3>
+    <p>API uses JSON input and output with POST-requests on this URL</p>
+    <h3>engine</h3>
+   		<input type="radio" name="engine" value="entscheidsuche" checked><label for="entscheidsuche">entscheidsuche.ch</label><br>
+   		<input type="radio" name="engine" value="swisscovery"><label for="swisscovery">Swisscovery</label><br>
+   		<input type="radio" name="engine" value="zora"><label for="zora">Zora</label><br>
+   		<input type="radio" name="engine" value="boris"><label for="boris">Boris</label><br>
+    
+    <h3>type="search"</h3>
+    	<p>term: <input type="text" id="term1"></p>
+    	<p><button type="button" onclick="search()">Send search Request</button></p>
+
+    <h3>type="hitlist"</h3>
+    	<p>term: <input type="text" id="term2">
+    	start: <input type="text" id="start2" value="0" size="3">
+    	count: <input type="text" id="count2" value="10" size="3"></p>
+    	<p><button type="button" onclick="hits()">Send hitlist Request</button></p>
+    	
+    <h3>Request body</h3>
+    <p id="body"></p>
+    <h3>Return status</h3>
+    <p id="status"></p>
+    <h3>Return value</h3>
+    <p id="result"></p>
+ 
+    
+  </body>
+</html>
+
+
