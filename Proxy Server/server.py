@@ -27,10 +27,10 @@ class MyServer(BaseHTTPRequestHandler):
 
 	def do_POST(self):
 		self.send_response(200)
-		self.send_header("Content-type", "application/json")
+		self.send_header("Content-type", "application/json; charset=utf-8")
 		self.end_headers()
 		reply={}
-		if self.headers.get("Content-type").lower()=="application/json":
+		if "application/json" in self.headers.get("Content-type").lower():
 			data = self.rfile.read(int(self.headers.get('Content-Length')))
 			sdata=json.loads(data)
 			if 'engine' in sdata:
@@ -46,12 +46,13 @@ class MyServer(BaseHTTPRequestHandler):
 				else:
 					reply['error']='engine '+engine+' unknown'
 		else:
-			reply['error']='no engine specified'
+			reply['error']='unexpected Content-type: '+self.headers.get("Content-type")
 		if 'error' in reply:
 			reply['status']='error'
 		else:
 			reply['status']='ok'
-		self.wfile.write(bytes(json.dumps(reply),'utf-8'))
+		string=json.dumps(reply, ensure_ascii=False).encode('utf8')
+		self.wfile.write(string)
 
 if __name__ == "__main__":        
     webServer = HTTPServer((hostName, serverPort), MyServer)
@@ -64,4 +65,5 @@ if __name__ == "__main__":
 
     webServer.server_close()
     print("Server stopped.")
+
 
