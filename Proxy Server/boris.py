@@ -4,6 +4,7 @@ import json
 import lxml.html
 import urllib
 import re
+from lxml.etree import tostring
 
 class Boris(Adapter):
 	name="Boris"
@@ -41,14 +42,30 @@ class Boris(Adapter):
 	def treffer(self, suchstring, start, count):
 		urlsuchstring=urllib.parse.quote_plus(suchstring)
 		argumente=self.arguments.format(count=count, start=start, suchterm=urlsuchstring)
+		# print(self.host+self.suchpfad+argumente)
+		# print(self.headers)
 		response=requests.get(url=self.host+self.suchpfad+argumente, headers=self.headers)
 		trefferliste=[]
 		tree = lxml.html.fromstring(response.text)
 		for dokument in tree.xpath("//tr[@class='ep_search_result']"):
-			s=dokument.xpath("string(./td[span])").strip()
-			zeile1=self.leerplatz.sub(" ",s)
-			zeile2=""
-			zeile3=""
+			# print(tostring(dokument))
+			autor=dokument.xpath("(./td/span|/td[span]/text())[not(preceding-sibling::a)]")
+			autors=""
+			for a in autor:
+				autors+=tostring(a).decode("utf-8")
+			titel1=dokument.xpath("string(./td[span]/a[1])")
+			titel2=dokument.xpath("string(./td[span]/a[1]/following-sibling::text()[count(preceding-sibling::a)=1])")
+			sonst1=dokument.xpath("string(./td[span]/a[2])")
+			sonst2=dokument.xpath("string(./td[span]/a[2]/following-sibling::text())")
+			
+			zeile1=self.leerplatz.sub(" ",autors)
+			zeile2=" <span @class='hl1'>"+self.leerplatz.sub(" ",titel1)+"</span> "+self.leerplatz.sub(" ",titel2)
+			if sonst1:
+				zeile3="DOI: "+self.leerplatz.sub(" ",sonst1)
+				if sonst2:
+					zeile3+=" <span @class='hl2'>"+self.leerplatz.sub(" ",sonst2)+"</span>"
+			else:
+				zeile3=""
 			url=dokument.xpath("./td[span]/a[1]/@href")
 			trefferliste.append({'description':[zeile1, zeile2, zeile3],'url': url})
 		return "ok", "", trefferliste
