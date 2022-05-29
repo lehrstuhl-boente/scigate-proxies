@@ -1,7 +1,8 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from socketserver import ThreadingMixIn
+import threading
 import time
 import json
-#import entscheidsuche
 from boris import Boris
 from zora import Zora
 from swisscovery import Swisscovery
@@ -53,9 +54,13 @@ class MyServer(BaseHTTPRequestHandler):
 			reply['status']='ok'
 		string=json.dumps(reply, ensure_ascii=False).encode('utf8')
 		self.wfile.write(string)
-
+		
+class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+    """Handle requests in a separate thread."""
+    #server.serve_forwever()
+    
 if __name__ == "__main__":        
-    webServer = HTTPServer((hostName, serverPort), MyServer)
+    webServer = ThreadedHTTPServer((hostName, serverPort), MyServer)
     print("Server started http://%s:%s" % (hostName, serverPort))
 
     try:

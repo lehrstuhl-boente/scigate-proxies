@@ -25,21 +25,19 @@ class Swisscovery(Adapter):
 	
 	def __init__(self):
 		super().__init__(self.name)
-		
-	def suche(self, suchstring):
-		urlsuchstring=urllib.parse.quote_plus(suchstring)
-		argumente=self.arguments.format(count=10, start=0, suchterm=urlsuchstring)
-		response=requests.get(url=self.host+self.suchpfad+argumente, headers=self.headers)
-		rs=json.loads(response.text)
-		treffer=rs['info']['total']
-		return "ok", "", treffer
-		
-	def treffer(self, suchstring, start, count):
+
+	def request(self, suchstring, start=0,count=Adapter.LISTSIZE):
+		# count is only a recommendation
+		# print("Start Swisscovery-Request")
 		urlsuchstring=urllib.parse.quote_plus(suchstring)
 		argumente=self.arguments.format(count=count, start=start, suchterm=urlsuchstring)	
 		response=requests.get(url=self.host+self.suchpfad+argumente, headers=self.headers)
-		#print("URL: "+self.host+self.suchpfad+argumente)
+		if response.status_code >= 300:
+			return "http-response: "+str(response.status_code)
 		rs=json.loads(response.text)
+		if not 'info' in rs:
+			return "no valid response"
+		treffer=rs['info']['total']
 		trefferliste=[]
 		for dokument in rs['docs']:
 			zeile1="(unknown title)"
@@ -65,4 +63,6 @@ class Swisscovery(Adapter):
 				print("Fehler: "+json.dumps(dokument))
 			url=self.host+self.dokumentpfad.format(docid=docid, context=context)
 			trefferliste.append({'description':[zeile1, zeile2, zeile3],'url': url})
-		return "ok", "", trefferliste
+		self.addcache(suchstring,start,treffer,trefferliste)
+		# print("Ende Swisscovery-Request")		
+		return

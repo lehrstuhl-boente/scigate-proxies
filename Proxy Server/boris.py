@@ -29,24 +29,22 @@ class Boris(Adapter):
 	
 	def __init__(self):
 		super().__init__(self.name)
-		
-	def suche(self, suchstring):
+
+	def request(self, suchstring, start=0, count=Adapter.LISTSIZE):
+		# count is ignored here
+		print("Start Boris-Request für "+suchstring+" ab "+str(start))
 		urlsuchstring=urllib.parse.quote_plus(suchstring)
-		argumente=self.arguments.format(count=10, start=0, suchterm=urlsuchstring)
+		argumente=self.arguments.format(start=start, suchterm=urlsuchstring)
 		response=requests.get(url=self.host+self.suchpfad+argumente, headers=self.headers)
-		tree = lxml.html.fromstring(response.text)
-		counts=tree.xpath("//div[@class='ep_search_controls']/div/span[@class='ep_search_number']/text()")
-		treffer=int(counts[len(counts)-1])
-		return "ok", "", treffer
-		
-	def treffer(self, suchstring, start, count):
-		urlsuchstring=urllib.parse.quote_plus(suchstring)
-		argumente=self.arguments.format(count=count, start=start, suchterm=urlsuchstring)
-		# print(self.host+self.suchpfad+argumente)
-		# print(self.headers)
-		response=requests.get(url=self.host+self.suchpfad+argumente, headers=self.headers)
+
+		if response.status_code >= 300:
+			return "http-response: "+str(response.status_code)
+
 		trefferliste=[]
 		tree = lxml.html.fromstring(response.text)
+		counts=tree.xpath("//div[@class='ep_search_controls']/div/span[@class='ep_search_number']/text()")
+		trefferzahl=int(counts[len(counts)-1])
+
 		for dokument in tree.xpath("//tr[@class='ep_search_result']"):
 			# print(tostring(dokument))
 			autor=dokument.xpath("(./td/span|/td[span]/text())[not(preceding-sibling::a)]")
@@ -68,4 +66,7 @@ class Boris(Adapter):
 				zeile3=""
 			url=dokument.xpath("./td[span]/a[1]/@href")
 			trefferliste.append({'description':[zeile1, zeile2, zeile3],'url': url})
-		return "ok", "", trefferliste
+
+		self.addcache(suchstring,start,trefferzahl,trefferliste)
+		# print("Ende Boris-Request")		
+		return

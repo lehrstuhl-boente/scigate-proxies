@@ -25,24 +25,25 @@ class Entscheidsuche(Adapter):
 	def __init__(self):
 		super().__init__(self.name)
 		
-	def suche(self, suchstring):
-		body={"size":1,"_source":{"excludes":["attachment.content"]},"track_total_hits":True,"query":{"bool":{"must":{"query_string":{"query":suchstring,"default_operator":"AND","type":"cross_fields","fields":["title.*^5","abstract.*^3","meta.*^10","attachment.content","reference^3"]}}}},"sort":[{"_score":"desc"},{"id":"desc"}],"highlight":{"fields":{"title.de":{"number_of_fragments":0},"abstract.de":{"number_of_fragments":0},"attachment.content":{}}}}
-		
-		response=requests.post(url=self.host+self.suchpfad, headers=self.headers, data=json.dumps(body))
-		text=response.text
-		rs=json.loads(text)
-		treffer=rs['hits']['total']['value']
-		return "ok", "", treffer
-		
-	def treffer(self, suchstring, start, count):
+	def request(self, suchstring, start=0,count=Adapter.LISTSIZE):
+		# count is only a recommendation
+		# print("Start Entscheidsuche-Request")
 		body={"size":count,"_source":{"excludes":["attachment.content"]},"track_total_hits":True,"query":{"bool":{"must":{"query_string":{"query":suchstring,"default_operator":"AND","type":"cross_fields","fields":["title.*^5","abstract.*^3","meta.*^10","attachment.content","reference^3"]}}}},"sort":[{"_score":"desc"},{"id":"desc"}],"highlight":{"fields":{"title.de":{"number_of_fragments":0},"abstract.de":{"number_of_fragments":0},"attachment.content":{}}},"from": start}
 		response=requests.post(url=self.host+self.suchpfad, headers=self.headers, data=json.dumps(body))
+		if response.status_code >= 300:
+			return "http-response: "+str(response.status_code)
 		rs=json.loads(response.text)
+		if not 'hits' in rs:
+			return "no valid response"
+		treffer=rs['hits']['total']['value']
 		trefferliste=[]
 		for dokument in rs['hits']['hits']:
 			zeile1=dokument['_source']['title']['de']
-			zeile2=dokument['_source']['abstract']['de']
+			if 'abstract' in dokument['_source']: zeile2=dokument['_source']['abstract']['de']
+			else: zeile2=""
 			zeile3=""
 			url="https://entscheidsuche.ch/view/"+dokument['_id']
 			trefferliste.append({'description':[zeile1, zeile2, zeile3],'url': url})
-		return "ok", "", trefferliste
+		self.addcache(suchstring,start,treffer,trefferliste)
+		# print("Ende Entscheidsuche-Request")		
+		return	
