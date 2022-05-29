@@ -37,8 +37,8 @@ class Zora(Adapter):
 		rs=json.loads(response.text)
 		trefferliste=[]
 		for dokument in rs['hits']['hits']:
-			zeile1=dokument['_source']['proxy_title']
-			zeile2=", ".join(dokument['_source']['agg_name_key'])
+			zeile1=dokument['_source']['proxy_title'].encode('raw_unicode_escape').decode('utf-8')
+			zeile2=(", ".join(dokument['_source']['agg_name_key'])).encode('raw_unicode_escape').decode('utf-8')
 			zeile3=""
 			if 'highlight' in dokument:
 				for h in dokument['highlight']:
