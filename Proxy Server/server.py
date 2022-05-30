@@ -28,7 +28,7 @@ class MyServer(BaseHTTPRequestHandler):
 
 	def do_POST(self):
 		self.send_response(200)
-		self.send_header("Content-type", "application/json; charset=utf-8")
+		self.send_header({"Content-type": "application/json; charset=utf-8","Access-Control-Allow-Origin": "*"})
 		self.end_headers()
 		reply={}
 		if "application/json" in self.headers.get("Content-type").lower():
