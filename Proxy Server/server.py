@@ -16,6 +16,13 @@ boris=Boris()
 entscheidsuche=Entscheidsuche()
 
 class MyServer(BaseHTTPRequestHandler):
+	def do_OPTIONS(self):
+		self.send_response(200,"ok")
+		self.send_header('Access-Control-Allow-Credentials', 'true')
+		self.send_header('Access-Control-Allow-Origin', '*')
+		self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+		self.send_header("Access-Control-Allow-Headers", "X-Requested-With, Content-type")
+		
 	def do_GET(self):
 		self.send_response(200)
 		self.send_header("Content-type", "text/html")
@@ -28,7 +35,10 @@ class MyServer(BaseHTTPRequestHandler):
 
 	def do_POST(self):
 		self.send_response(200)
-		self.send_header({"Content-type": "application/json; charset=utf-8","Access-Control-Allow-Origin": "*"})
+		self.send_header("Content-type", "application/json; charset=utf-8")
+		self.send_header("Access-Control-Allow-Origin", "*")
+		self.send_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+		self.send_header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
 		self.end_headers()
 		reply={}
 		if "application/json" in self.headers.get("Content-type").lower():
