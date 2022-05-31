@@ -47,24 +47,24 @@ class Boris(Adapter):
 
 		for dokument in tree.xpath("//tr[@class='ep_search_result']"):
 			# print(tostring(dokument))
-			autor=dokument.xpath("(./td/span|/td[span]/text())[not(preceding-sibling::a)]")
+			autor=dokument.xpath("(./td/span/text()|/td[span]/text())[not(preceding-sibling::a)]")
 			autors=""
 			for a in autor:
-				autors+=tostring(a).decode("utf-8")
+				autors+=str(a)
 			titel1=dokument.xpath("string(./td[span]/a[1])")
 			titel2=dokument.xpath("string(./td[span]/a[1]/following-sibling::text()[count(preceding-sibling::a)=1])")
 			sonst1=dokument.xpath("string(./td[span]/a[2])")
 			sonst2=dokument.xpath("string(./td[span]/a[2]/following-sibling::text())")
 			
 			zeile1=self.leerplatz.sub(" ",autors)
-			zeile2=" <span @class='hl1'>"+self.leerplatz.sub(" ",titel1)+"</span> "+self.leerplatz.sub(" ",titel2)
+			zeile2=self.leerplatz.sub(" ",titel1)+self.leerplatz.sub(" ",titel2)
 			if sonst1:
 				zeile3="DOI: "+self.leerplatz.sub(" ",sonst1)
 				if sonst2:
-					zeile3+=" <span @class='hl2'>"+self.leerplatz.sub(" ",sonst2)+"</span>"
+					zeile3+=self.leerplatz.sub(" ",sonst2)
 			else:
 				zeile3=""
-			url=dokument.xpath("./td[span]/a[1]/@href")
+			url=dokument.xpath("./td[span]/a[1]/@href")[0]
 			trefferliste.append({'description':[zeile1, zeile2, zeile3],'url': url})
 
 		self.addcache(suchstring,start,trefferzahl,trefferliste)

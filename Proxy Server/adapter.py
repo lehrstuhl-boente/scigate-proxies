@@ -69,7 +69,7 @@ class Adapter():
 				return "error", fehler, []
 		
 		trefferzahl=self.cache[suchstring].trefferzahl
-		if trefferzahl<=von:
+		if trefferzahl<=von and von>0:
 			return "error", "Search has only "+str(self.cache[suchstring].trefferzahl)+ " Hits. Cannot serve a hitlist starting with hit "+str(von)+".", []
 		else:
 			treffercache=self.cache[suchstring].trefferliste

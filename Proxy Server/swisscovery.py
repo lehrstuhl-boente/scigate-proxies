@@ -2,6 +2,7 @@ from adapter import Adapter
 import requests
 import json
 import urllib
+import re
 
 class Swisscovery(Adapter):
 	name="Swisscovery"
@@ -22,6 +23,7 @@ class Swisscovery(Adapter):
 	suchpfad="/primaws/rest/pub/pnxs"
 	arguments="?blendFacetsSeparately=false&disableCache=false&getMore=0&inst=41SLSP_NETWORK&lang=de&limit={count}&newspapersActive=false&newspapersSearch=false&offset={start}&pcAvailability=false&q=any,contains,{suchterm}&qExclude=&qInclude=&rapido=false&refEntryActive=true&rtaLinks=true&scope=DN_and_CI&searchInFulltextUserSelection=true&skipDelivery=Y&sort=rank&tab=41SLSP_NETWORK&vid=41SLSP_NETWORK:VU1_UNION"
 	dokumentpfad="/discovery/fulldisplay?docid={docid}&context={context}&vid=41SLSP_NETWORK:VU1_UNION&lang=de&search_scope=DN_and_CI&adaptor=Local%20Search%20Engine&tab=41SLSP_NETWORK"
+	reDoppelklammern=re.compile("(?:<<|>>)")
 	
 	def __init__(self):
 		super().__init__(self.name)
@@ -45,7 +47,7 @@ class Swisscovery(Adapter):
 			zeile3="(unknown info)"
 			if 'sort' in dokument['pnx']:
 				if 'title' in dokument['pnx']['sort']:
-					zeile1=dokument['pnx']['sort']['title'][0]
+					zeile1=self.reDoppelklammern.sub("",dokument['pnx']['sort']['title'][0])
 				if 'author' in dokument['pnx']['sort']:
 					zeile2=dokument['pnx']['sort']['author'][0]
 

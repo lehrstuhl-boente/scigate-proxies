@@ -17,11 +17,13 @@ entscheidsuche=Entscheidsuche()
 
 class MyServer(BaseHTTPRequestHandler):
 	def do_OPTIONS(self):
-		self.send_response(200,"ok")
+		self.send_response(204,"ok")
 		self.send_header('Access-Control-Allow-Credentials', 'true')
 		self.send_header('Access-Control-Allow-Origin', '*')
-		self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-		self.send_header("Access-Control-Allow-Headers", "X-Requested-With, Content-type")
+		self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+		self.send_header("Access-Control-Allow-Headers", "X-Requested-With, Content-type, Origin, Accept")
+		self.send_header("Access-Control-Max-Age", "86400")
+		self.end_headers()
 		
 	def do_GET(self):
 		self.send_response(200)

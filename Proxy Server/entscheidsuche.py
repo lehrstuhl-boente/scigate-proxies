@@ -2,6 +2,7 @@ from adapter import Adapter
 import requests
 import json
 import urllib
+import re
 
 class Entscheidsuche(Adapter):
 	name="Entscheidsuche"
@@ -21,6 +22,7 @@ class Entscheidsuche(Adapter):
 	host="https://entscheidsuche.pansoft.de:9200"
 	suchpfad="/entscheidsuche-*/_search"
 	dokumentpfad="/id/eprint/"
+	reStrip=re.compile(r"<br>")
 	
 	def __init__(self):
 		super().__init__(self.name)
@@ -38,8 +40,8 @@ class Entscheidsuche(Adapter):
 		treffer=rs['hits']['total']['value']
 		trefferliste=[]
 		for dokument in rs['hits']['hits']:
-			zeile1=dokument['_source']['title']['de']
-			if 'abstract' in dokument['_source']: zeile2=dokument['_source']['abstract']['de']
+			zeile1=self.reStrip.sub(" ",dokument['_source']['title']['de'])
+			if 'abstract' in dokument['_source']: zeile2=self.reStrip.sub(" ",dokument['_source']['abstract']['de'])
 			else: zeile2=""
 			zeile3=""
 			url="https://entscheidsuche.ch/view/"+dokument['_id']
