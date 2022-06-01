@@ -42,9 +42,9 @@ class Swisscovery(Adapter):
 		treffer=rs['info']['total']
 		trefferliste=[]
 		for dokument in rs['docs']:
-			zeile1="(unknown title)"
-			zeile2="(unknown author)"
-			zeile3="(unknown info)"
+			zeile1=""
+			zeile2=""
+			zeile3=""
 			if 'sort' in dokument['pnx']:
 				if 'title' in dokument['pnx']['sort']:
 					zeile1=self.reDoppelklammern.sub("",dokument['pnx']['sort']['title'][0])
@@ -54,8 +54,9 @@ class Swisscovery(Adapter):
 			if 'addata' in dokument['pnx']:
 				if 'btitle' in dokument['pnx']['addata']:
 					zeile3=dokument['pnx']['addata']['btitle'][0]
-				else:
+				elif 'date' in dokument['pnx']['addata']:
 					zeile3=dokument['pnx']['addata']['date'][0]
+					
 			docid=dokument['pnx']['control']['recordid'][0]
 			#print(json.dumps(dokument['pnx']['control']['recordid']))
 			context="XXX"
