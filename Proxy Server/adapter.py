@@ -32,9 +32,9 @@ class Adapter():
 					count=10
 					if 'count' in command:
 						count=int(command['count'])
-					status, fehler, trefferliste, von=self.treffer(command['term'], start, count)
+					status, fehler, trefferliste = self.treffer(command['term'], start, count)
 					if status=='ok':
-						return {'status': 'ok', 'hitlist': trefferliste, 'start': von}
+						return {'status': 'ok', 'hitlist': trefferliste, 'start': start, 'searchterm': command['term']}
 				else:
 					fehler='no searchterm given'
 			else:
@@ -87,7 +87,7 @@ class Adapter():
 					print("Treffer "+str(i)+" nicht erhalten.")
 				i+=1
 			print("Für Suchanfrage '"+suchstring+"' "+str(trefferzahl)+" Treffer gefunden und ab Position "+str(von)+" "+str(len(ergebnis))+" Ergebnisse zurückgegeben.")
-			return "ok","",ergebnis, von
+			return "ok","",ergebnis
 						
 	def addcache(self, suchstring,start,treffer,trefferliste):
 		print("Addcache ab "+str(start)+" mit "+str(len(trefferliste))+" Treffern in der Liste.")
