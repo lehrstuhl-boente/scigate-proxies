@@ -42,30 +42,36 @@ class Boris(Adapter):
 
 		trefferliste=[]
 		tree = lxml.html.fromstring(response.text)
-		counts=tree.xpath("//div[@class='ep_search_controls']/div/span[@class='ep_search_number']/text()")
-		trefferzahl=int(counts[len(counts)-1])
+		# print(response.text)
+		ergebnis=tree.xpath("//div[@class='ep_search_controls']/div/text()[1]")
+		print(ergebnis[0])
+		if ergebnis[0]=='Search has no matches.':
+			trefferzahl=0
+		else:
+			counts=tree.xpath("//div[@class='ep_search_controls']/div/span[@class='ep_search_number']/text()")
+			trefferzahl=int(counts[len(counts)-1])
 
-		for dokument in tree.xpath("//tr[@class='ep_search_result']"):
-			# print(tostring(dokument))
-			autor=dokument.xpath("(./td/span/text()|/td[span]/text())[not(preceding-sibling::a)]")
-			autors=""
-			for a in autor:
-				autors+=str(a)
-			titel1=dokument.xpath("string(./td[span]/a[1])")
-			titel2=dokument.xpath("string(./td[span]/a[1]/following-sibling::text()[count(preceding-sibling::a)=1])")
-			sonst1=dokument.xpath("string(./td[span]/a[2])")
-			sonst2=dokument.xpath("string(./td[span]/a[2]/following-sibling::text())")
+			for dokument in tree.xpath("//tr[@class='ep_search_result']"):
+				# print(tostring(dokument))
+				autor=dokument.xpath("(./td/span/text()|/td[span]/text())[not(preceding-sibling::a)]")
+				autors=""
+				for a in autor:
+					autors+=str(a)
+				titel1=dokument.xpath("string(./td[span]/a[1])")
+				titel2=dokument.xpath("string(./td[span]/a[1]/following-sibling::text()[count(preceding-sibling::a)=1])")
+				sonst1=dokument.xpath("string(./td[span]/a[2])")
+				sonst2=dokument.xpath("string(./td[span]/a[2]/following-sibling::text())")
 			
-			zeile1=self.leerplatz.sub(" ",autors)
-			zeile2=self.leerplatz.sub(" ",titel1)+self.leerplatz.sub(" ",titel2)
-			if sonst1:
-				zeile3="DOI: "+self.leerplatz.sub(" ",sonst1)
-				if sonst2:
-					zeile3+=self.leerplatz.sub(" ",sonst2)
-			else:
-				zeile3=""
-			url=dokument.xpath("./td[span]/a[1]/@href")[0]
-			trefferliste.append({'description':[zeile1, zeile2, zeile3],'url': url})
+				zeile1=self.leerplatz.sub(" ",autors)
+				zeile2=self.leerplatz.sub(" ",titel1)+self.leerplatz.sub(" ",titel2)
+				if sonst1:
+					zeile3="DOI: "+self.leerplatz.sub(" ",sonst1)
+					if sonst2:
+						zeile3+=self.leerplatz.sub(" ",sonst2)
+				else:
+					zeile3=""
+				url=dokument.xpath("./td[span]/a[1]/@href")[0]
+				trefferliste.append({'description':[zeile1, zeile2, zeile3],'url': url})
 
 		self.addcache(suchstring,start,trefferzahl,trefferliste)
 		# print("Ende Boris-Request")		
