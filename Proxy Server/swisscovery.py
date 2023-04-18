@@ -28,7 +28,7 @@ class Swisscovery(Adapter):
 	def __init__(self):
 		super().__init__(self.name)
 
-	def request(self, suchstring, start=0,count=Adapter.LISTSIZE):
+	def request(self, suchstring, filters='', start=0,count=Adapter.LISTSIZE):
 		# count is only a recommendation
 		# print("Start Swisscovery-Request")
 		urlsuchstring=urllib.parse.quote_plus(suchstring)
@@ -66,6 +66,6 @@ class Swisscovery(Adapter):
 				print("Fehler: "+json.dumps(dokument))
 			url=self.host+self.dokumentpfad.format(docid=docid, context=context)
 			trefferliste.append({'description':[zeile1, zeile2, zeile3],'url': url})
-		self.addcache(suchstring,start,treffer,trefferliste)
+		self.addcache(suchstring+'#',start,treffer,trefferliste)
 		# print("Ende Swisscovery-Request")		
 		return

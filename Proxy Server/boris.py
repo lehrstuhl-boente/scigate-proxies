@@ -30,7 +30,7 @@ class Boris(Adapter):
 	def __init__(self):
 		super().__init__(self.name)
 
-	def request(self, suchstring, start=0, count=Adapter.LISTSIZE):
+	def request(self, suchstring, filters='', start=0, count=Adapter.LISTSIZE):
 		# count is ignored here
 		print("Start Boris-Request für "+suchstring+" ab "+str(start))
 		urlsuchstring=urllib.parse.quote_plus(suchstring)
@@ -73,6 +73,6 @@ class Boris(Adapter):
 				url=dokument.xpath("./td[span]/a[1]/@href")[0]
 				trefferliste.append({'description':[zeile1, zeile2, zeile3],'url': url})
 
-		self.addcache(suchstring,start,trefferzahl,trefferliste)
+		self.addcache(suchstring+'#',start,trefferzahl,trefferliste)
 		# print("Ende Boris-Request")		
 		return

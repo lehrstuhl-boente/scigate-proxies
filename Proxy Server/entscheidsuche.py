@@ -27,10 +27,14 @@ class Entscheidsuche(Adapter):
 	def __init__(self):
 		super().__init__(self.name)
 		
-	def request(self, suchstring, start=0,count=Adapter.LISTSIZE):
+	def request(self, suchstring, filters='', start=0,count=Adapter.LISTSIZE):
 		# count is only a recommendation
 		# print("Start Entscheidsuche-Request")
 		body={"size":count,"_source":{"excludes":["attachment.content"]},"track_total_hits":True,"query":{"bool":{"must":{"query_string":{"query":suchstring,"default_operator":"AND","type":"cross_fields","fields":["title.*^5","abstract.*^3","meta.*^10","attachment.content","reference^3"]}}}},"sort":[{"_score":"desc"},{"id":"desc"}],"highlight":{"fields":{"title.de":{"number_of_fragments":0},"abstract.de":{"number_of_fragments":0},"attachment.content":{}}},"from": start}
+		if filters:
+			body[filters]=json.loads(filters,replace('@','"'))
+        #"filter":[{"terms":{"attachment.language":["de"]}},{"terms":{"hierarchy":["AG"]}},{"range":{"date":{"lte":1509015759293}}}]}}
+        #"filters":"{"language":{"type":"language","payload":["de"]},"hierarchie":{"type":"hierarchie","payload":["CH"]}}"
 		response=requests.post(url=self.host+self.suchpfad, headers=self.headers, data=json.dumps(body))
 		if response.status_code >= 300:
 			return "http-response: "+str(response.status_code)
@@ -46,6 +50,6 @@ class Entscheidsuche(Adapter):
 			zeile3=""
 			url="https://entscheidsuche.ch/view/"+dokument['_id']
 			trefferliste.append({'description':[zeile1, zeile2, zeile3],'url': url})
-		self.addcache(suchstring,start,treffer,trefferliste)
+		self.addcache(suchstring+'#'+filters,start,treffer,trefferliste)
 		# print("Ende Entscheidsuche-Request")		
 		return	

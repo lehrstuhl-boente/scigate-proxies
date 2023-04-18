@@ -16,10 +16,12 @@ class Adapter():
 	def execute(self, command):
 		print("execute: "+json.dumps(command))
 		status='error'
+		if not 'filters' in command:
+			command['filters']=''
 		if 'type' in command:
 			if command['type']=='search':
 				if 'term' in command:
-					status, fehler, trefferzahl=self.suche(command['term'])
+					status, fehler, trefferzahl=self.suche(command['term'], command['filters'])
 					if status=='ok':
 						return {'status': 'ok', 'hits': trefferzahl}
 				else:
@@ -32,9 +34,9 @@ class Adapter():
 					count=10
 					if 'count' in command:
 						count=int(command['count'])
-					status, fehler, trefferliste = self.treffer(command['term'], start, count)
+					status, fehler, trefferliste = self.treffer(command['term'], command['filters'], start, count)
 					if status=='ok':
-						return {'status': 'ok', 'hitlist': trefferliste, 'start': start, 'searchterm': command['term']}
+						return {'status': 'ok', 'hitlist': trefferliste, 'start': start, 'searchterm': command['term'], 'filters': command['filters'}
 				else:
 					fehler='no searchterm given'
 			else:
@@ -43,67 +45,71 @@ class Adapter():
 			fehler='no command type given'
 		return {'error': fehler}
 			
-	def suche(self, suchstring):
-		if suchstring in self.cache:
-			if (datetime.datetime.now()-self.cache[suchstring].zeit).total_seconds()<86000:
-				return "ok", "", self.cache[suchstring].trefferzahl
+	def suche(self, suchstring, filters):
+		cachekey=suchstring+'#'+filters
+		if cachekey in self.cache:
+			if (datetime.datetime.now()-self.cache[cachekey].zeit).total_seconds()<86000:
+				return "ok", "", self.cache[cachekey].trefferzahl
 			else:
-				del self.cache[suchstring]
+				del self.cache[cachekey]
 		
-		fehler=self.request(suchstring)
+		fehler=self.request(suchstring, filters)
 		if fehler:
 			return "error", fehler, 0
 		else:
-			return "ok", "", self.cache[suchstring].trefferzahl
+			return "ok", "", self.cache[cachekey].trefferzahl
 	
-	def treffer(self, suchstring,von=0,zahl=10):
-		if suchstring in self.cache:
-			if (datetime.datetime.now()-self.cache[suchstring].zeit).total_seconds()>86000:
-				del self.cache[suchstring]				
-				fehler=self.request(suchstring, von, max(self.LISTSIZE,zahl))
+	def treffer(self, suchstring, filters, von=0,zahl=10):
+		cachekey=suchstring+'#'+filters
+		if cachekey in self.cache:
+			if (datetime.datetime.now()-self.cache[cachekey].zeit).total_seconds()>86000:
+				del self.cache[cachekey]				
+				fehler=self.request(suchstring, filters, von, max(self.LISTSIZE,zahl))
 				if fehler:
 					return "error", fehler, []
 		else:
-			fehler=self.request(suchstring, von, max(self.LISTSIZE,zahl))
+			fehler=self.request(suchstring, filters, von, max(self.LISTSIZE,zahl))
 			if fehler:
 				return "error", fehler, []
 		
-		trefferzahl=self.cache[suchstring].trefferzahl
+		trefferzahl=self.cache[cachekey].trefferzahl
 		if trefferzahl<=von and von>0:
-			return "error", "Search has only "+str(self.cache[suchstring].trefferzahl)+ " Hits. Cannot serve a hitlist starting with hit "+str(von)+".", []
+			return "error", "Search has only "+str(self.cache[cachekey].trefferzahl)+ " Hits. Cannot serve a hitlist starting with hit "+str(von)+".", []
 		else:
-			treffercache=self.cache[suchstring].trefferliste
+			treffercache=self.cache[cachekey].trefferliste
 			i=von
 			ergebnis=[]
 			while i<min(von+zahl,trefferzahl) :
 				if i not in treffercache:
-					fehler=self.request(suchstring, i, max(self.LISTSIZE,zahl-(i-von)))
+					fehler=self.request(suchstring, filters, i, max(self.LISTSIZE,zahl-(i-von)))
 					if fehler:
 						return "error", fehler, []
-					treffercache=self.cache[suchstring].trefferliste# 
+					treffercache=self.cache[cachekey].trefferliste 
 				if i in treffercache:
 					ergebnis.append(treffercache[i])
 				else:
 					print("Treffer "+str(i)+" nicht erhalten.")
 				i+=1
-			print("Für Suchanfrage '"+suchstring+"' "+str(trefferzahl)+" Treffer gefunden und ab Position "+str(von)+" "+str(len(ergebnis))+" Ergebnisse zurückgegeben.")
+			print("Für Suchanfrage '"+cachekey+"' "+str(trefferzahl)+" Treffer gefunden und ab Position "+str(von)+" "+str(len(ergebnis))+" Ergebnisse zurückgegeben.")
 			return "ok","",ergebnis
 						
-	def addcache(self, suchstring,start,treffer,trefferliste):
+	def addcache(self, suchstring, filters, start,treffer,trefferliste):
+		cachekey=suchstring+'#'+filters
 		print("Addcache ab "+str(start)+" mit "+str(len(trefferliste))+" Treffern in der Liste.")
-		if suchstring in self.cache:
-			if self.cache[suchstring].update(suchstring, treffer, trefferliste, start):
-				del self.cache[suchstring]
-		if not suchstring in self.cache:
-			self.cache[suchstring]=Cacheeintrag(suchstring, treffer, trefferliste, start)
+		if cachekey in self.cache:
+			if self.cache[cachekey].update(suchstring, filters, treffer, trefferliste, start):
+				del self.cache[cachekey]
+		if not cachekey in self.cache:
+			self.cache[cachekey]=Cacheeintrag(suchstring, filters, treffer, trefferliste, start)
 	
 	def request(self, suche, von=0):
 		return "not implemented"
 
 class Cacheeintrag():
 
-	def __init__(self, suche, trefferzahl, trefferliste, start=0):
+	def __init__(self, suche, filters, trefferzahl, trefferliste, start=0):
 		self.suche=suche
+		self.filters=filters
 		self.trefferzahl=trefferzahl
 		self.trefferliste={}
 		for i in trefferliste:
@@ -111,9 +117,9 @@ class Cacheeintrag():
 			start+=1
 		self.zeit=datetime.datetime.now()
 		
-	def update(self, suche, trefferzahl, trefferliste, start=0):
+	def update(self, suche, filters, trefferzahl, trefferliste, start=0):
 		# print("Start update mit start="+str(start)+" und "+str(len(trefferliste))+" Treffern in der Liste.")
-		if suche!=self.suche:
+		if suche!=self.suche or filters !=self.filters:
 			return False
 		if trefferzahl!=self.trefferzahl:
 			return False
