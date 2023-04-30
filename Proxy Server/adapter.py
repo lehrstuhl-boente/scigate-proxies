@@ -64,11 +64,11 @@ class Adapter():
 		if cachekey in self.cache:
 			if (datetime.datetime.now()-self.cache[cachekey].zeit).total_seconds()>86000:
 				del self.cache[cachekey]				
-				fehler=self.request(suchstring, filter, von, max(self.LISTSIZE,zahl))
+				fehler=self.request(suchstring, filter, von, min(self.LISTSIZE,zahl))
 				if fehler:
 					return "error", fehler, []
 		else:
-			fehler=self.request(suchstring, filter, von, max(self.LISTSIZE,zahl))
+			fehler=self.request(suchstring, filter, von, min(self.LISTSIZE,zahl))
 			if fehler:
 				return "error", fehler, []
 		
