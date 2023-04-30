@@ -32,7 +32,8 @@ class Entscheidsuche(Adapter):
 		# print("Start Entscheidsuche-Request")
 		body={"size":count,"_source":{"excludes":["attachment.content"]},"track_total_hits":True,"query":{"bool":{"must":{"query_string":{"query":suchstring,"default_operator":"AND","type":"cross_fields","fields":["title.*^5","abstract.*^3","meta.*^10","attachment.content","reference^3"]}}}},"sort":[{"_score":"desc"},{"id":"desc"}],"highlight":{"fields":{"title.de":{"number_of_fragments":0},"abstract.de":{"number_of_fragments":0},"attachment.content":{}}},"from": start}
 		if filters:
-			body[filters]=json.loads(filters,replace('@','"'))
+			body['query']['bool']['filter']=json.loads(filters.replace('@','"'))
+		print(json.dumps(body))
         #"filter":[{"terms":{"attachment.language":["de"]}},{"terms":{"hierarchy":["AG"]}},{"range":{"date":{"lte":1509015759293}}}]}}
         #"filters":"{"language":{"type":"language","payload":["de"]},"hierarchie":{"type":"hierarchie","payload":["CH"]}}"
 		response=requests.post(url=self.host+self.suchpfad, headers=self.headers, data=json.dumps(body))
