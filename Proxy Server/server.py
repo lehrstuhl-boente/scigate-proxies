@@ -3,7 +3,7 @@ from socketserver import ThreadingMixIn
 import threading
 import time
 import json
-from boris import Boris
+#from boris import Boris
 from zora import Zora
 from swisscovery import Swisscovery
 from entscheidsuche import Entscheidsuche
@@ -12,7 +12,7 @@ hostName = ""
 serverPort = 8080
 zora=Zora()
 swisscovery=Swisscovery()
-boris=Boris()
+#boris=Boris()
 entscheidsuche=Entscheidsuche()
 
 class MyServer(BaseHTTPRequestHandler):
@@ -50,8 +50,8 @@ class MyServer(BaseHTTPRequestHandler):
 				engine=sdata['engine']
 				if engine=='entscheidsuche':
 					reply=entscheidsuche.execute(sdata)
-				elif engine=='boris':
-					reply=boris.execute(sdata)
+				#elif engine=='boris':
+					#reply=boris.execute(sdata)
 				elif engine=='zora':
 					reply=zora.execute(sdata)
 				elif engine=='swisscovery':
@@ -65,7 +65,7 @@ class MyServer(BaseHTTPRequestHandler):
 		else:
 			reply['status']='ok'
 		string=json.dumps(reply, ensure_ascii=False).encode('utf8')
-		print(string);
+		print(string)
 		self.wfile.write(string)
 		
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):

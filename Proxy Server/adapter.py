@@ -124,7 +124,7 @@ class Cacheeintrag():
 		aktzeit=datetime.datetime.now()
 		diff=(aktzeit-self.zeit).total_seconds()
 		if diff>86000:
-			return false
+			return False
 		for i in trefferliste:
 			self.trefferliste[start]=copy.deepcopy(i)
 			start+=1

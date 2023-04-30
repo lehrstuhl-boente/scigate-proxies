@@ -1,10 +1,9 @@
 from adapter import Adapter
 import requests
 import json
-import lxml.html
+import lxml
 import urllib
 import re
-from lxml.etree import tostring
 
 class Boris(Adapter):
 	name="Boris"
