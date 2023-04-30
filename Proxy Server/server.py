@@ -7,6 +7,7 @@ from boris import Boris
 from zora import Zora
 from swisscovery import Swisscovery
 from entscheidsuche import Entscheidsuche
+from fedlex import Fedlex
 
 hostName = ""
 serverPort = 8080
@@ -14,6 +15,7 @@ zora=Zora()
 swisscovery=Swisscovery()
 boris=Boris()
 entscheidsuche=Entscheidsuche()
+fedlex=Fedlex()
 
 class MyServer(BaseHTTPRequestHandler):
 	def do_OPTIONS(self):
@@ -56,6 +58,8 @@ class MyServer(BaseHTTPRequestHandler):
 					reply=zora.execute(sdata)
 				elif engine=='swisscovery':
 					reply=swisscovery.execute(sdata)
+				elif engine=='fedlex':
+					reply=fedlex.execute(sdata)
 				else:
 					reply['error']='engine '+engine+' unknown'
 		else:
