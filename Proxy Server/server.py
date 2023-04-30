@@ -8,6 +8,7 @@ from zora import Zora
 from swisscovery import Swisscovery
 from entscheidsuche import Entscheidsuche
 from fedlex import Fedlex
+from repositorium import Repositorium
 
 hostName = ""
 serverPort = 8080
@@ -16,6 +17,7 @@ swisscovery=Swisscovery()
 boris=Boris()
 entscheidsuche=Entscheidsuche()
 fedlex=Fedlex()
+repositorium=Repositorium()
 
 class MyServer(BaseHTTPRequestHandler):
 	def do_OPTIONS(self):
@@ -52,14 +54,16 @@ class MyServer(BaseHTTPRequestHandler):
 				engine=sdata['engine']
 				if engine=='entscheidsuche':
 					reply=entscheidsuche.execute(sdata)
-				elif engine=='boris':
-					reply=boris.execute(sdata)
+				#elif engine=='boris':
+					#reply=boris.execute(sdata)
 				elif engine=='zora':
 					reply=zora.execute(sdata)
 				elif engine=='swisscovery':
 					reply=swisscovery.execute(sdata)
 				elif engine=='fedlex':
 					reply=fedlex.execute(sdata)
+				elif engine=='repositorium':
+					reply=repositorium.execute(sdata)
 				else:
 					reply['error']='engine '+engine+' unknown'
 		else:
@@ -69,7 +73,7 @@ class MyServer(BaseHTTPRequestHandler):
 		else:
 			reply['status']='ok'
 		string=json.dumps(reply, ensure_ascii=False).encode('utf8')
-		print(string);
+		print(string)
 		self.wfile.write(string)
 		
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
