@@ -3,17 +3,19 @@ from socketserver import ThreadingMixIn
 import threading
 import time
 import json
-#from boris import Boris
+from boris import Boris
 from zora import Zora
 from swisscovery import Swisscovery
 from entscheidsuche import Entscheidsuche
+from repositorium import Repositorium
 
 hostName = ""
 serverPort = 8080
 zora=Zora()
 swisscovery=Swisscovery()
-#boris=Boris()
+boris=Boris()
 entscheidsuche=Entscheidsuche()
+repositorium=Repositorium()
 
 class MyServer(BaseHTTPRequestHandler):
 	def do_OPTIONS(self):
@@ -56,6 +58,8 @@ class MyServer(BaseHTTPRequestHandler):
 					reply=zora.execute(sdata)
 				elif engine=='swisscovery':
 					reply=swisscovery.execute(sdata)
+				elif engine=='repositorium':
+					reply=repositorium.execute(sdata)
 				else:
 					reply['error']='engine '+engine+' unknown'
 		else:
