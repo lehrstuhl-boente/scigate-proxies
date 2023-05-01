@@ -9,6 +9,7 @@ from swisscovery import Swisscovery
 from entscheidsuche import Entscheidsuche
 from fedlex import Fedlex
 from repositorium import Repositorium
+from swisslexGreen import SwisslexGreen
 
 hostName = ""
 serverPort = 8080
@@ -18,6 +19,7 @@ boris=Boris()
 entscheidsuche=Entscheidsuche()
 fedlex=Fedlex()
 repositorium=Repositorium()
+swisslexGreen=SwisslexGreen()
 
 class MyServer(BaseHTTPRequestHandler):
 	def do_OPTIONS(self):
@@ -54,8 +56,8 @@ class MyServer(BaseHTTPRequestHandler):
 				engine=sdata['engine']
 				if engine=='entscheidsuche':
 					reply=entscheidsuche.execute(sdata)
-				#elif engine=='boris':
-					#reply=boris.execute(sdata)
+				elif engine=='boris':
+					reply=boris.execute(sdata)
 				elif engine=='zora':
 					reply=zora.execute(sdata)
 				elif engine=='swisscovery':
@@ -64,6 +66,8 @@ class MyServer(BaseHTTPRequestHandler):
 					reply=fedlex.execute(sdata)
 				elif engine=='repositorium':
 					reply=repositorium.execute(sdata)
+				elif engine=='swisslexGreen':
+					reply=swisslexGreen.execute(sdata)
 				else:
 					reply['error']='engine '+engine+' unknown'
 		else:
