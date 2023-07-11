@@ -102,7 +102,7 @@ class Adapter():
 			self.cache[cachekey]=Cacheeintrag(cachekey, treffer, trefferliste, start)
 	
 	def request(self, suche, von=0):
-		return "not implemented"
+		raise NotImplementedError
 
 class Cacheeintrag():
 

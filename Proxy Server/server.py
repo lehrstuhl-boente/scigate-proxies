@@ -10,9 +10,10 @@ from entscheidsuche import Entscheidsuche
 from fedlex import Fedlex
 from repositorium import Repositorium
 from swisslexGreen import SwisslexGreen
+from legalanthology import Legalanthology
 
-hostName = ""
-serverPort = 8080
+hostName="localhost"
+serverPort=8080
 zora=Zora()
 swisscovery=Swisscovery()
 boris=Boris()
@@ -20,6 +21,7 @@ entscheidsuche=Entscheidsuche()
 fedlex=Fedlex()
 repositorium=Repositorium()
 swisslexGreen=SwisslexGreen()
+legalanthology=Legalanthology()
 
 class MyServer(BaseHTTPRequestHandler):
 	def do_OPTIONS(self):
@@ -68,6 +70,8 @@ class MyServer(BaseHTTPRequestHandler):
 					reply=repositorium.execute(sdata)
 				elif engine=='swisslexGreen':
 					reply=swisslexGreen.execute(sdata)
+				elif engine=='legalanthology':
+					reply=legalanthology.execute(sdata)
 				else:
 					reply['error']='engine '+engine+' unknown'
 		else:
