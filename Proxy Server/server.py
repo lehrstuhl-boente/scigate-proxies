@@ -81,7 +81,7 @@ class MyServer(BaseHTTPRequestHandler):
 		else:
 			reply['status']='ok'
 		string=json.dumps(reply, ensure_ascii=False).encode('utf8')
-		print(string)
+		#print(string)
 		self.wfile.write(string)
 		
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
