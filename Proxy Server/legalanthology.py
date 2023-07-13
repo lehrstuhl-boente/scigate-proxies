@@ -1,5 +1,4 @@
 from adapter import Adapter
-import urllib
 import requests
 import json
 import re
@@ -40,10 +39,9 @@ class Legalanthology(Adapter):
       return "http-response: "+str(response.status_code)
     result = re.search('___ASPSTART_DATA___(.*)___ASPEND_DATA___', response.text)
     data = json.loads(result.group(1)) # extract JSON from return text
-    #print(json.dumps(data, indent=2, default=str))
     treffer=data['full_results_count']
     trefferliste=[]
-    print(json.dumps(data['results'], indent=2, default=str))
+    #print(json.dumps(data['results'], indent=2, default=str))
     for dokument in data['results']:
       zeile1 = dokument['title']
       zeile2 = dokument['content']

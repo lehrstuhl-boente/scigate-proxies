@@ -11,6 +11,7 @@ from fedlex import Fedlex
 from repositorium import Repositorium
 from swisslexGreen import SwisslexGreen
 from legalanthology import Legalanthology
+from digitalisierungszentrum import Digitalisierungszentrum
 
 hostName="localhost"
 serverPort=8080
@@ -22,6 +23,7 @@ fedlex=Fedlex()
 repositorium=Repositorium()
 swisslexGreen=SwisslexGreen()
 legalanthology=Legalanthology()
+digitalisierungszentrum=Digitalisierungszentrum()
 
 class MyServer(BaseHTTPRequestHandler):
 	def do_OPTIONS(self):
@@ -72,6 +74,8 @@ class MyServer(BaseHTTPRequestHandler):
 					reply=swisslexGreen.execute(sdata)
 				elif engine=='legalanthology':
 					reply=legalanthology.execute(sdata)
+				elif engine=='digitalisierungszentrum':
+					reply=digitalisierungszentrum.execute(sdata)
 				else:
 					reply['error']='engine '+engine+' unknown'
 		else:
