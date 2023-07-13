@@ -14,7 +14,7 @@ class Digitalisierungszentrum(Adapter):
   def __init__(self):
     super().__init__(self.name)
 
-  def request(self, suchstring, filters='', start=0,count=Adapter.LISTSIZE):
+  def request(self, suchstring, filters='', start=0, count=Adapter.LISTSIZE):
     urlsuchstring = urllib.parse.quote_plus(suchstring)
     sort_field = "relevancy"
     sort_order = "asc"

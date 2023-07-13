@@ -12,6 +12,7 @@ from repositorium import Repositorium
 from swisslexGreen import SwisslexGreen
 from legalanthology import Legalanthology
 from digitalisierungszentrum import Digitalisierungszentrum
+from gotriple import GoTriple
 
 hostName="localhost"
 serverPort=8080
@@ -24,6 +25,7 @@ repositorium=Repositorium()
 swisslexGreen=SwisslexGreen()
 legalanthology=Legalanthology()
 digitalisierungszentrum=Digitalisierungszentrum()
+gotriple=GoTriple()
 
 class MyServer(BaseHTTPRequestHandler):
 	def do_OPTIONS(self):
@@ -76,6 +78,8 @@ class MyServer(BaseHTTPRequestHandler):
 					reply=legalanthology.execute(sdata)
 				elif engine=='digitalisierungszentrum':
 					reply=digitalisierungszentrum.execute(sdata)
+				elif engine=='gotriple':
+					reply=gotriple.execute(sdata)
 				else:
 					reply['error']='engine '+engine+' unknown'
 		else:
