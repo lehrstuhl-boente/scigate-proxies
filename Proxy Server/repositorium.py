@@ -45,6 +45,7 @@ class Repositorium(Adapter):
       zeile2=", ".join(coauthorsArray)
 
       zeile3="Publish date: "+dokumentAnswer["Erschienen_am"]+" | "+dokumentAnswer["Erschienen_in"]
+      
       trefferliste.append({
         "description": [zeile1, zeile2, zeile3],
         "url": "https://dev.repositorium.ch/Entry/"+str(dokumentAnswer["id"])

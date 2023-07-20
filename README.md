@@ -43,3 +43,7 @@ These procies have a JSON REST-API:
    - hitlist: list of hits every hit has the following attributes
       - description: list of 3 strings describing the hit. As markup can be included <span>-Tags with the classes hl1 and hl2 for bold and italic.
       - url: URL to the hit at the search engine. Can be opened without context and should be opened in a new tab
+
+## Development
+
+Installing lxml on Mac: `sudo -H python3 -m pip install lxml`

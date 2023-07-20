@@ -52,14 +52,14 @@ class Adapter():
 				return "ok", "", self.cache[cachekey].trefferzahl
 			else:
 				del self.cache[cachekey]
-		
+
 		fehler=self.request(suchstring, filter)
 		if fehler:
 			return "error", fehler, 0
 		else:
 			return "ok", "", self.cache[cachekey].trefferzahl
 	
-	def treffer(self, suchstring, filter, von=0,zahl=10):
+	def treffer(self, suchstring, filter, von=0, zahl=10):
 		cachekey=suchstring+'#'+filter
 		if cachekey in self.cache:
 			if (datetime.datetime.now()-self.cache[cachekey].zeit).total_seconds()>86000:
@@ -79,7 +79,7 @@ class Adapter():
 			treffercache=self.cache[cachekey].trefferliste
 			i=von
 			ergebnis=[]
-			while i<min(von+zahl,trefferzahl) :
+			while i<min(von+zahl,trefferzahl):
 				if i not in treffercache:
 					fehler=self.request(suchstring, filter, i, max(self.LISTSIZE,zahl-(i-von)))
 					if fehler:
@@ -102,7 +102,7 @@ class Adapter():
 			self.cache[cachekey]=Cacheeintrag(cachekey, treffer, trefferliste, start)
 	
 	def request(self, suche, von=0):
-		return "not implemented"
+		raise NotImplementedError
 
 class Cacheeintrag():
 
