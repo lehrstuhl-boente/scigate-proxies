@@ -51,4 +51,5 @@ class Repositorium(Adapter):
 				"url": "https://dev.repositorium.ch/Entry/"+str(dokumentAnswer["id"])
 			})
 
+
 		self.addcache(suchstring+'#'+filters,start,treffer,trefferliste)
