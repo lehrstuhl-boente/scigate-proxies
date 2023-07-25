@@ -3,16 +3,16 @@ from socketserver import ThreadingMixIn
 import threading
 import time
 import json
-from boris import Boris
-from zora import Zora
-from swisscovery import Swisscovery
-from entscheidsuche import Entscheidsuche
-from fedlex import Fedlex
-from repositorium import Repositorium
-from swisslexGreen import SwisslexGreen
-from legalanthology import Legalanthology
-from digitalisierungszentrum import Digitalisierungszentrum
-from gotriple import GoTriple
+from engines.boris import Boris
+from engines.zora import Zora
+from engines.swisscovery import Swisscovery
+from engines.entscheidsuche import Entscheidsuche
+from engines.fedlex import Fedlex
+from engines.repositorium import Repositorium
+from engines.swisslexGreen import SwisslexGreen
+from engines.legalanthology import Legalanthology
+from engines.digitalisierungszentrum import Digitalisierungszentrum
+from engines.gotriple import GoTriple
 
 hostName="localhost"
 serverPort=8080
