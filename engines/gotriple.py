@@ -4,6 +4,7 @@ import requests
 import json
 
 class GoTriple(Adapter):
+  id="gotriple"
   name = 'GoTriple'
   headers = {}
   host = 'https://api.gotriple.eu'

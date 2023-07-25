@@ -5,6 +5,7 @@ import urllib
 import re
 
 class Fedlex(Adapter):
+	id="fedlex"
 	name="Fedlex"
 
 	host="https://www.fedlex.admin.ch"

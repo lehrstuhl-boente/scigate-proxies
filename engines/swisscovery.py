@@ -5,6 +5,7 @@ import urllib
 import re
 
 class Swisscovery(Adapter):
+	id="swisscovery"
 	name="Swisscovery"
 	headers={
 		'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:100.0) Gecko/20100101 Firefox/100.0',

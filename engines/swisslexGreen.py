@@ -5,6 +5,7 @@ import urllib
 import re
 
 class SwisslexGreen(Adapter):
+	id="swisslexgreen"
 	name="Swisslex Green"
 
 	host="https://lexcampus.swisslex.ch"

@@ -4,6 +4,7 @@ import requests
 import json
 
 class Repositorium(Adapter):
+	id="repositorium"
 	name="Repositorium"
 	headers={
 		"Accept": "application/json, text/plain, */*",

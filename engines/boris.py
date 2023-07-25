@@ -7,6 +7,7 @@ import re
 from lxml.etree import tostring
 
 class Boris(Adapter):
+	id="boris"
 	name="Boris"
 	headers={
 		'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:100.0) Gecko/20100101 Firefox/100.0',

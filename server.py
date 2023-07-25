@@ -1,8 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from socketserver import ThreadingMixIn
-import threading
-import time
 import json
+from adapter import Adapter
 from engines.boris import Boris
 from engines.zora import Zora
 from engines.swisscovery import Swisscovery
@@ -16,16 +15,6 @@ from engines.gotriple import GoTriple
 
 hostName="localhost"
 serverPort=8080
-zora=Zora()
-swisscovery=Swisscovery()
-boris=Boris()
-entscheidsuche=Entscheidsuche()
-fedlex=Fedlex()
-repositorium=Repositorium()
-swisslexGreen=SwisslexGreen()
-legalanthology=Legalanthology()
-digitalisierungszentrum=Digitalisierungszentrum()
-gotriple=GoTriple()
 
 class MyServer(BaseHTTPRequestHandler):
 	def do_OPTIONS(self):
@@ -51,37 +40,35 @@ class MyServer(BaseHTTPRequestHandler):
 		self.send_response(200)
 		self.send_header("Content-type", "application/json; charset=utf-8")
 		self.send_header("Access-Control-Allow-Origin", "*")
-		self.send_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-		self.send_header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
+		self.send_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+		self.send_header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS')
 		self.end_headers()
 		reply={}
 		if "application/json" in self.headers.get("Content-type").lower():
 			data = self.rfile.read(int(self.headers.get('Content-Length')))
 			sdata=json.loads(data)
 			if 'engine' in sdata:
-				engine=sdata['engine']
-				if engine=='entscheidsuche':
-					reply=entscheidsuche.execute(sdata)
-				elif engine=='boris':
-					reply=boris.execute(sdata)
-				elif engine=='zora':
-					reply=zora.execute(sdata)
-				elif engine=='swisscovery':
-					reply=swisscovery.execute(sdata)
-				elif engine=='fedlex':
-					reply=fedlex.execute(sdata)
-				elif engine=='repositorium':
-					reply=repositorium.execute(sdata)
-				elif engine=='swisslexGreen':
-					reply=swisslexGreen.execute(sdata)
-				elif engine=='legalanthology':
-					reply=legalanthology.execute(sdata)
-				elif engine=='digitalisierungszentrum':
-					reply=digitalisierungszentrum.execute(sdata)
-				elif engine=='gotriple':
-					reply=gotriple.execute(sdata)
-				else:
-					reply['error']='engine '+engine+' unknown'
+				engines = [
+					Zora(),
+					Swisscovery(),
+					Boris(),
+					Entscheidsuche(),
+					Fedlex(),
+					Repositorium(),
+					SwisslexGreen(),
+					Legalanthology(),
+					Digitalisierungszentrum(),
+					GoTriple()
+				]
+				engineUnknown = True
+				engine: Adapter	# type hint
+				for engine in engines:
+					if engine.id == sdata['engine']:
+						reply = engine.execute(sdata)
+						engineUnknown = False
+						break
+				if engineUnknown:
+					reply['error'] = 'engine ' + sdata['engine'] + ' unknown'
 		else:
 			reply['error']='unexpected Content-type: '+self.headers.get("Content-type")
 		if 'error' in reply:
@@ -89,7 +76,6 @@ class MyServer(BaseHTTPRequestHandler):
 		else:
 			reply['status']='ok'
 		string=json.dumps(reply, ensure_ascii=False).encode('utf8')
-		#print(string)
 		self.wfile.write(string)
 		
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):

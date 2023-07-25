@@ -5,6 +5,7 @@ import json
 import re
 
 class Digitalisierungszentrum(Adapter):
+  id="digitalisierungszentrum"
   name = "Münchner DigitalisierungsZentrum"
   headers = {}
   host = "https://www.digitale-sammlungen.de"

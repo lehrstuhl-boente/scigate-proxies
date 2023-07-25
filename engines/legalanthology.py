@@ -4,6 +4,7 @@ import json
 import re
 
 class Legalanthology(Adapter):
+  id="legalanthology"
   name="The Anthology of Swiss Legal Culture"
   headers = {
     "accept": "text/html",
