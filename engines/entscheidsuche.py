@@ -61,7 +61,12 @@ class Entscheidsuche(Adapter):
 			zeile3=""
 			sort=dokument['sort']
 			url="https://entscheidsuche.ch/view/"+dokument['_id']
-			trefferliste.append({'description':[zeile1, zeile2, zeile3],'url': url, 'sort': sort})
+			trefferliste.append({
+				'engineId': self.id,
+				'description':[zeile1, zeile2, zeile3],
+				'url': url,
+				'sort': sort
+			})
 		self.addcache(suchstring+'#'+filters,start,treffer,trefferliste)
 		# print("Ende Entscheidsuche-Request")		
 		return	

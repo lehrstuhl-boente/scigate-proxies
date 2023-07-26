@@ -72,7 +72,11 @@ class Boris(Adapter):
 				else:
 					zeile3=""
 				url=dokument.xpath("./td[span]/a[1]/@href")[0]
-				trefferliste.append({'description':[zeile1, zeile2, zeile3],'url': url})
+				trefferliste.append({
+					'engineId': self.id,
+					'description':[zeile1, zeile2, zeile3],
+					'url': url
+				})
 
 		self.addcache(suchstring+'#',start,trefferzahl,trefferliste)
 		# print("Ende Boris-Request")		

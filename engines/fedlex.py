@@ -36,7 +36,6 @@ class Fedlex(Adapter):
 		response=requests.post(url=self.host+self.suchpfad, data=da_ascii, headers=self.headers)
 		if response.status_code >= 300:
 			return "http-response: "+str(response.status_code)
-		print(response.text)
 		#r=response.content
 		#ru=r.decode("ascii")
 		#rs=json.loads(ru.encode("utf-8"))
@@ -45,7 +44,6 @@ class Fedlex(Adapter):
 			return "no valid response"
 		treffer=rs['hits']['total']['value']
 		trefferliste=[]
-		print("Hits found:", treffer)
 		for dokument in rs['hits']['hits']:
 			if 'included' in dokument['_source']:
 				z=[]
@@ -69,6 +67,10 @@ class Fedlex(Adapter):
 				zeile3=""
 			
 			url=dokument['_id']
-			trefferliste.append({'description':[zeile1, zeile2, zeile3],'url': urllib.parse.unquote(url)})
+			trefferliste.append({
+				'engineId': self.id,
+				'description':[zeile1, zeile2, zeile3],
+				'url': urllib.parse.unquote(url)
+			})
 		self.addcache(suchwort+'#',start,treffer,trefferliste)	
 		return	

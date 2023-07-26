@@ -48,6 +48,7 @@ class Repositorium(Adapter):
 
 			zeile3="Publish date: "+dokumentAnswer["Erschienen_am"]+" | "+dokumentAnswer["Erschienen_in"]
 			trefferliste.append({
+				'engineId': self.id,
 				"description": [zeile1, zeile2, zeile3],
 				"url": "https://dev.repositorium.ch/Entry/"+str(dokumentAnswer["id"])
 			})

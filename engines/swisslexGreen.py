@@ -71,6 +71,10 @@ class SwisslexGreen(Adapter):
 				if 'series' in dokument:
 					zeile3+=" "+dokument['series']
 				url=self.host+self.dokpfad+dokument['targetID']
-				trefferliste.append({'description':[zeile1, zeile2, zeile3],'url': urllib.parse.unquote(url)})
+				trefferliste.append({
+					'engineId': self.id,
+					'description':[zeile1, zeile2, zeile3],
+					'url': urllib.parse.unquote(url)
+				})
 		self.addcache(suchwort+'#',start,treffer,trefferliste)	
 		return	

@@ -47,7 +47,11 @@ class Zora(Adapter):
 						zeile3=dokument['highlight'][h][0]
 						break
 			url=self.host+self.dokumentpfad+dokument['_id']+"/"
-			trefferliste.append({'description':[zeile1, zeile2, zeile3],'url': url})
+			trefferliste.append({
+				'engineId': self.id,
+				'description': [zeile1, zeile2, zeile3],
+				'url': url
+			})
 		self.addcache(suchstring+'#',start,treffer,trefferliste)
 		# print("Ende Zora-Request")		
 		return

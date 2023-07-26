@@ -48,6 +48,7 @@ class Legalanthology(Adapter):
       zeile2 = dokument['content']
       zeile3 = dokument['date']
       trefferliste.append({
+        'engineId': self.id,
         "description": [zeile1, zeile2, zeile3],
         "url": dokument['link']
       })

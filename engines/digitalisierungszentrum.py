@@ -39,6 +39,7 @@ class Digitalisierungszentrum(Adapter):
       
       url = 'https://mdz-nbn-resolving.de/details:' + dokument['id']
       trefferliste.append({
+        'engineId': self.id,
         'description': [zeile1, zeile2, zeile3],
         'url': url
       })

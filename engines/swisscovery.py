@@ -66,7 +66,11 @@ class Swisscovery(Adapter):
 			else:
 				print("Fehler: "+json.dumps(dokument))
 			url=self.host+self.dokumentpfad.format(docid=docid, context=context)
-			trefferliste.append({'description':[zeile1, zeile2, zeile3],'url': url})
+			trefferliste.append({
+				'engineId': self.id,
+				'description': [zeile1, zeile2, zeile3],
+				'url': url
+			})
 		self.addcache(suchstring+'#',start,treffer,trefferliste)
 		# print("Ende Swisscovery-Request")		
 		return

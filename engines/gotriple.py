@@ -61,6 +61,7 @@ class GoTriple(Adapter):
       #url = 'https://www.gotriple.eu' + dokument['@id']
       url = dokument['main_entity_of_page'][0]
       trefferliste.append({
+        'engineId': self.id,
         'description': [zeile1, zeile2, zeile3],
         'url': url
       })
