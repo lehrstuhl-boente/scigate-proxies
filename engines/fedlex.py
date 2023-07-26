@@ -55,6 +55,7 @@ class Fedlex(Adapter):
 							z.append(dokument['_source']['included'][j]['attributes']['title']['xsd:string'])
 							i+=1
 					j+=1
+			if len(z) == 0: continue	# TODO: documents without title attribute are currently skipped
 			zeile1=z[0]
 			if i>1:
 				zeile2=z[1]
