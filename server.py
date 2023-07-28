@@ -13,7 +13,7 @@ from engines.legalanthology import Legalanthology
 from engines.digitalisierungszentrum import Digitalisierungszentrum
 from engines.gotriple import GoTriple
 
-hostName="localhost"
+hostName=""
 serverPort=8080
 
 class MyServer(BaseHTTPRequestHandler):
