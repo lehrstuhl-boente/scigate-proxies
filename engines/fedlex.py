@@ -45,8 +45,8 @@ class Fedlex(Adapter):
 		treffer=rs['hits']['total']['value']
 		trefferliste=[]
 		for dokument in rs['hits']['hits']:
+			z=[]
 			if 'included' in dokument['_source']:
-				z=[]
 				i=0
 				j=1
 				while j<4:
@@ -55,7 +55,14 @@ class Fedlex(Adapter):
 							z.append(dokument['_source']['included'][j]['attributes']['title']['xsd:string'])
 							i+=1
 					j+=1
-			if len(z) == 0: continue	# TODO: documents without title attribute are currently skipped
+			if len(z) == 0:
+				if 'data' in dokument['_source'] and 'attributes' in dokument['_source']['data']:
+					if 'titleTreaty' in dokument['_source']['data']['attributes']:
+						z.append(dokument['_source']['data']['attributes']['titleTreaty']['rdf:langString']['de'][0])
+						z.append(dokument['_source']['data']['attributes']['titleTreaty']['rdf:langString']['fr'][0])
+						z.append(dokument['_source']['data']['attributes']['titleTreaty']['rdf:langString']['it'][0])
+						i = 3
+			if len(z) == 0: continue	# documents that don't have a title and that aren't treaties are skipped
 			zeile1=z[0]
 			if i>1:
 				zeile2=z[1]
