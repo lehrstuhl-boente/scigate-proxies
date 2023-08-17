@@ -46,8 +46,8 @@ class Fedlex(Adapter):
 		trefferliste=[]
 		for dokument in rs['hits']['hits']:
 			z=[]
+			i=0
 			if 'included' in dokument['_source']:
-				i=0
 				j=1
 				while j<4:
 					if 'attributes' in dokument['_source']['included'][j]:
@@ -58,21 +58,25 @@ class Fedlex(Adapter):
 			if len(z) == 0:
 				if 'data' in dokument['_source'] and 'attributes' in dokument['_source']['data']:
 					if 'titleTreaty' in dokument['_source']['data']['attributes']:
-						z.append(dokument['_source']['data']['attributes']['titleTreaty']['rdf:langString']['de'][0])
-						z.append(dokument['_source']['data']['attributes']['titleTreaty']['rdf:langString']['fr'][0])
-						z.append(dokument['_source']['data']['attributes']['titleTreaty']['rdf:langString']['it'][0])
-						i = 3
+						tmp = dokument['_source']['data']['attributes']
+						if 'de' in tmp:
+							z.append(dokument['_source']['data']['attributes']['titleTreaty']['rdf:langString']['de'][0])
+							i += 1
+						if 'fr' in tmp:
+							z.append(dokument['_source']['data']['attributes']['titleTreaty']['rdf:langString']['fr'][0])
+							i += 1
+						if 'it' in tmp:
+							z.append(dokument['_source']['data']['attributes']['titleTreaty']['rdf:langString']['it'][0])
+							i += 1
 			if len(z) == 0: continue	# documents that don't have a title and that aren't treaties are skipped
+
 			zeile1=z[0]
-			if i>1:
-				zeile2=z[1]
-				if i>2:
-					zeile3=z[2]
-				else:
-					zeile3=""
-			else:
-				zeile2=""
-				zeile3=""
+			zeile2 = ''
+			zeile3 = ''
+			if i >= 2:
+				zeile2 = z[1]
+			if i >= 3:
+				zeile3 = z[2]
 			
 			url=dokument['_id']
 			trefferliste.append({
