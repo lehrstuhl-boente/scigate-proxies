@@ -45,4 +45,4 @@ class Digitalisierungszentrum(Adapter):
           'description': [zeile1, zeile2, zeile3],
           'url': url
         })
-    self.addcache(suchstring+'#'+filters,start,treffer,trefferliste)
+    self.addcache(suchstring+'#',start,treffer,trefferliste)

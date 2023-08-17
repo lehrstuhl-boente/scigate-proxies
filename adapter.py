@@ -14,14 +14,13 @@ class Adapter():
 		self.cache={}
 	
 	def execute(self, command):
-		#print("execute: "+json.dumps(command))
 		status='error'
-		if not 'filter' in command:
-			command['filter']=''
+		if not 'filters' in command:
+			command['filters']=''
 		if 'type' in command:
 			if command['type']=='search':
 				if 'term' in command:
-					status, fehler, trefferzahl=self.suche(command['term'], command['filter'])
+					status, fehler, trefferzahl=self.suche(command['term'], command['filters'])
 					if status=='ok':
 						return {'status': 'ok', 'hits': trefferzahl}
 				else:
@@ -34,9 +33,9 @@ class Adapter():
 					count=10
 					if 'count' in command:
 						count=int(command['count'])
-					status, fehler, trefferliste = self.treffer(command['term'], command['filter'], start, count)
+					status, fehler, trefferliste = self.treffer(command['term'], command['filters'], start, count)
 					if status=='ok':
-						return {'status': 'ok', 'hitlist': trefferliste, 'start': start, 'searchterm': command['term'], 'filter': command['filter']}
+						return {'status': 'ok', 'hitlist': trefferliste, 'start': start, 'searchterm': command['term'], 'filters': command['filters']}
 				else:
 					fehler='no searchterm given'
 			else:
@@ -45,30 +44,32 @@ class Adapter():
 			fehler='no command type given'
 		return {'error': fehler}
 			
-	def suche(self, suchstring, filter):
-		cachekey=suchstring+'#'+filter
+	def suche(self, suchstring, filters):
+		cachekey=suchstring+'#'
 		if cachekey in self.cache:
 			if (datetime.datetime.now()-self.cache[cachekey].zeit).total_seconds()<86000:
 				return "ok", "", self.cache[cachekey].trefferzahl
 			else:
 				del self.cache[cachekey]
 
-		fehler=self.request(suchstring, filter)
+		# apply engine-wide filters here
+
+		fehler=self.request(suchstring, filters)
 		if fehler:
 			return "error", fehler, 0
 		else:
 			return "ok", "", self.cache[cachekey].trefferzahl
 	
-	def treffer(self, suchstring, filter, von=0, zahl=10):
-		cachekey=suchstring+'#'+filter
+	def treffer(self, suchstring, filters, von=0, zahl=10):
+		cachekey=suchstring+'#'
 		if cachekey in self.cache:
 			if (datetime.datetime.now()-self.cache[cachekey].zeit).total_seconds()>86000:
 				del self.cache[cachekey]				
-				fehler=self.request(suchstring, filter, von, min(self.LISTSIZE,zahl))
+				fehler=self.request(suchstring, filters, von, min(self.LISTSIZE,zahl))
 				if fehler:
 					return "error", fehler, []
 		else:
-			fehler=self.request(suchstring, filter, von, min(self.LISTSIZE,zahl))
+			fehler=self.request(suchstring, filters, von, min(self.LISTSIZE,zahl))
 			if fehler:
 				return "error", fehler, []
 		
@@ -81,7 +82,7 @@ class Adapter():
 			ergebnis=[]
 			while i<min(von+zahl,trefferzahl):
 				if i not in treffercache:
-					fehler=self.request(suchstring, filter, i, max(self.LISTSIZE,zahl-(i-von)))
+					fehler=self.request(suchstring, filters, i, max(self.LISTSIZE,zahl-(i-von)))
 					if fehler:
 						return "error", fehler, []
 					treffercache=self.cache[cachekey].trefferliste 

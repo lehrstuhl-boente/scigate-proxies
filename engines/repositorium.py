@@ -52,4 +52,4 @@ class Repositorium(Adapter):
 			})
 
 
-		self.addcache(suchstring+'#'+filters,start,treffer,trefferliste)
+		self.addcache(suchstring+'#',start,treffer,trefferliste)

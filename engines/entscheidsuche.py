@@ -32,8 +32,9 @@ class Entscheidsuche(Adapter):
 		# count is only a recommendation
 		body={"size":count,"_source":{"excludes":["attachment.content"]},"track_total_hits":True,"query":{"bool":{"must":{"query_string":{"query":suchstring,"default_operator":"AND","type":"cross_fields","fields":["title.*^5","abstract.*^3","meta.*^10","attachment.content","reference^3"]}}}},"sort":[{"_score":"desc"},{"id":"desc"}],"from": start}
 		if filters:
-			body['query']['bool']['filter']=json.loads(filters.replace('@','"'))
-		cachekey=suchstring+'#'+filters
+			#body['query']['bool']['filter']=json.loads(filters.replace('@','"'))
+			pass
+		cachekey=suchstring+'#'
 		# Wenn der letzte Eintrag davor bekannt ist, "search_after" verwenden.
 		if start>0 and cachekey in self.cache:
 			treffercache=self.cache[cachekey].trefferliste
@@ -64,5 +65,5 @@ class Entscheidsuche(Adapter):
 				'url': url,
 				'sort': sort
 			})
-		self.addcache(suchstring+'#'+filters,start,treffer,trefferliste)
+		self.addcache(suchstring+'#',start,treffer,trefferliste)
 		return	
