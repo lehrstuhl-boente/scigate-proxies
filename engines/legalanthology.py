@@ -43,6 +43,7 @@ class Legalanthology(Adapter):
     treffer=data['full_results_count']
     trefferliste=[]
     for dokument in data['results']:
+      if type(dokument) == str: continue
       zeile1 = dokument['title']
       zeile2 = dokument['content']
       zeile3 = dokument['date']
