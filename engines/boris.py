@@ -33,7 +33,6 @@ class Boris(Adapter):
 
 	def request(self, suchstring, filters='', start=0, count=Adapter.LISTSIZE):
 		# count is ignored here
-		print("Start Boris-Request für "+suchstring+" ab "+str(start))
 		urlsuchstring=urllib.parse.quote_plus(suchstring)
 		argumente=self.arguments.format(start=start, suchterm=urlsuchstring)
 		response=requests.get(url=self.host+self.suchpfad+argumente, headers=self.headers)
@@ -43,9 +42,7 @@ class Boris(Adapter):
 
 		trefferliste=[]
 		tree = lxml.html.fromstring(response.text)
-		# print(response.text)
 		ergebnis=tree.xpath("//div[@class='ep_search_controls']/div/text()[1]")
-		print(ergebnis[0])
 		if ergebnis[0]=='Search has no matches.':
 			trefferzahl=0
 		else:
@@ -53,7 +50,6 @@ class Boris(Adapter):
 			trefferzahl=int(counts[len(counts)-1])
 
 			for dokument in tree.xpath("//tr[@class='ep_search_result']"):
-				# print(tostring(dokument))
 				autor=dokument.xpath("(./td/span/text()|/td[span]/text())[not(preceding-sibling::a)]")
 				autors=""
 				for a in autor:
@@ -79,5 +75,4 @@ class Boris(Adapter):
 				})
 
 		self.addcache(suchstring+'#',start,trefferzahl,trefferliste)
-		# print("Ende Boris-Request")		
 		return

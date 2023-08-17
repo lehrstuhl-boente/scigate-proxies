@@ -20,7 +20,6 @@ class Repositorium(Adapter):
 		super().__init__(self.name)
 
 	def request(self, suchstring, filters='', start=0, count=Adapter.LISTSIZE):
-		print("request", suchstring, filters, start, count)
 		urlsuchstring=urllib.parse.quote_plus(suchstring)
 		argumente = self.arguments.format(suchterm=urlsuchstring)
 		response=requests.get(url=self.host+self.suchpfad+argumente, headers=self.headers)
@@ -40,7 +39,6 @@ class Repositorium(Adapter):
 			coauthorsArray = []
 			if coauthors is not None:
 				for author in coauthors:
-					print(json.dumps(author, sort_keys=True, indent=2))
 					coauthorsArray.append(author["coauthor_first"]+author["coauthor_last"])
 			else:
 				coauthorsArray.append("No Author Provided")

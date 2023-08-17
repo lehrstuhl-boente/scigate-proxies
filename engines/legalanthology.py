@@ -42,7 +42,6 @@ class Legalanthology(Adapter):
     data = json.loads(result.group(1)) # extract JSON from return text
     treffer=data['full_results_count']
     trefferliste=[]
-    #print(json.dumps(data['results'], indent=2, default=str))
     for dokument in data['results']:
       zeile1 = dokument['title']
       zeile2 = dokument['content']

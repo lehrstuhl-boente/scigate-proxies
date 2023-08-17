@@ -14,7 +14,7 @@ class Adapter():
 		self.cache={}
 	
 	def execute(self, command):
-		print("execute: "+json.dumps(command))
+		#print("execute: "+json.dumps(command))
 		status='error'
 		if not 'filter' in command:
 			command['filter']=''
@@ -88,13 +88,14 @@ class Adapter():
 				if i in treffercache:
 					ergebnis.append(treffercache[i])
 				else:
-					print("Treffer "+str(i)+" nicht erhalten.")
+					#print("Treffer "+str(i)+" nicht erhalten.")
+					pass
 				i+=1
-			print("Für Suchanfrage '"+cachekey+"' "+str(trefferzahl)+" Treffer gefunden und ab Position "+str(von)+" "+str(len(ergebnis))+" Ergebnisse zurückgegeben.")
+			#print("Für Suchanfrage '"+cachekey+"' "+str(trefferzahl)+" Treffer gefunden und ab Position "+str(von)+" "+str(len(ergebnis))+" Ergebnisse zurückgegeben.")
 			return "ok","",ergebnis
 						
 	def addcache(self, cachekey, start,treffer,trefferliste):
-		print("Addcache ab "+str(start)+" mit "+str(len(trefferliste))+" Treffern in der Liste.")
+		#print("Addcache ab "+str(start)+" mit "+str(len(trefferliste))+" Treffern in der Liste.")
 		if cachekey in self.cache:
 			if self.cache[cachekey].update(cachekey, treffer, trefferliste, start):
 				del self.cache[cachekey]

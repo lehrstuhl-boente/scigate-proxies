@@ -25,22 +25,24 @@ class Digitalisierungszentrum(Adapter):
     if response.status_code >= 300:
       return "http-response: "+str(response.status_code)
     data = json.loads(response.text)
+    #print('xxx: ', json.dumps(data, indent=2))
     treffer = data['numTotal']
     trefferliste = []
-    for dokument in data['docs']:
-      zeile1 = dokument['title']
+    if 'docs' in data:
+      for dokument in data['docs']:
+        zeile1 = dokument['title']
 
-      zeile2 = ' • '.join(dokument['authors']) if 'authors' in dokument else ''
-      
-      publication_places = ', '.join(dokument['publicationPlaces']) if 'publicationPlaces' in dokument else ''
-      publishers = ', '.join(dokument['publishers']) if 'publishers' in dokument else ''
-      publication_date = dokument['publicationDate'] if 'publicationDate' in dokument else ''
-      zeile3 = f'{publication_places}: {publishers}, {publication_date}'
-      
-      url = 'https://mdz-nbn-resolving.de/details:' + dokument['id']
-      trefferliste.append({
-        'engineId': self.id,
-        'description': [zeile1, zeile2, zeile3],
-        'url': url
-      })
+        zeile2 = ' • '.join(dokument['authors']) if 'authors' in dokument else ''
+        
+        publication_places = ', '.join(dokument['publicationPlaces']) if 'publicationPlaces' in dokument else ''
+        publishers = ', '.join(dokument['publishers']) if 'publishers' in dokument else ''
+        publication_date = dokument['publicationDate'] if 'publicationDate' in dokument else ''
+        zeile3 = f'{publication_places}: {publishers}, {publication_date}'
+        
+        url = 'https://mdz-nbn-resolving.de/details:' + dokument['id']
+        trefferliste.append({
+          'engineId': self.id,
+          'description': [zeile1, zeile2, zeile3],
+          'url': url
+        })
     self.addcache(suchstring+'#'+filters,start,treffer,trefferliste)
