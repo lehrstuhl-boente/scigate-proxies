@@ -14,7 +14,7 @@ from engines.digitalisierungszentrum import Digitalisierungszentrum
 from engines.gotriple import GoTriple
 from engines.iurisprudentia import Iurisprudentia
 
-hostName=""
+hostName="localhost"
 serverPort=8080
 
 class MyServer(BaseHTTPRequestHandler):
