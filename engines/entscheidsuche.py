@@ -28,12 +28,22 @@ class Entscheidsuche(Adapter):
 	def __init__(self):
 		super().__init__(self.name)
 		
-	def request(self, suchstring, filters='', start=0,count=Adapter.LISTSIZE):
+	def request(self, suchstring, filters='', start=0, count=Adapter.LISTSIZE):
 		filter_object = []
 		if filters:
-			for filter in filters:
-				pass
-		# count is only a recommendation
+			for filter_id in filters:
+				options = filters[filter_id]
+				if filter_id == 'language':
+					if 'unknown' in options:
+						options.remove('unknown')
+					filter_object.append({
+						'terms': {
+							'attachment.language': options
+						}
+					})
+				elif filter_id == 'date':
+					pass
+		print(json.dumps(filter_object, indent=2))
 		body = {
 			"size": count,
 			"_source": {
