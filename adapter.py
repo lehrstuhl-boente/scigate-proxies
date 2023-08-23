@@ -33,7 +33,8 @@ class Adapter():
 					count=10
 					if 'count' in command:
 						count=int(command['count'])
-					status, fehler, trefferliste = self.treffer(command['term'], command['filters'], start, count)
+					filters = self.format_filters(command['filters'])
+					status, fehler, trefferliste = self.treffer(command['term'], filters, start, count)
 					if status=='ok':
 						return {'status': 'ok', 'hitlist': trefferliste, 'start': start, 'searchterm': command['term'], 'filters': command['filters']}
 				else:
@@ -44,6 +45,22 @@ class Adapter():
 			fehler='no command type given'
 		return {'error': fehler}
 			
+	def format_filters(self, filters):
+		formatted_filters = {}
+		for filter in filters:
+			if filter['type'] == 'checkbox':
+				options = []
+				for option in filter['options']:
+					if option['checked']:
+						options.append(option['name'])
+				if len(options) > 0:	# only consider filter when at least one checkbox is checked
+					formatted_filters[filter['id']] = options
+			elif filter['type'] == 'date':
+				pass
+			elif filter['type'] == 'switch':
+				pass
+		return formatted_filters
+
 	def suche(self, suchstring, filters):
 		cachekey=suchstring+'#'
 		if cachekey in self.cache:

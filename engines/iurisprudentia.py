@@ -63,7 +63,6 @@ class Iurisprudentia(Adapter):
     rs=json.loads(response.text)
     treffer = rs['total']
     trefferliste = []
-    print(len(rs['results']))
     for dokument in rs['results']:
       #url = f"http://rwi.app/iurisprudentia/de/___/documents/static/{dokument['id']}/pages/{dokument['761']}/?t={suchstring}"
       url = "http://rwi.app/iurisprudentia/"  # TODO: find out how link is built

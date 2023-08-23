@@ -29,11 +29,36 @@ class Entscheidsuche(Adapter):
 		super().__init__(self.name)
 		
 	def request(self, suchstring, filters='', start=0,count=Adapter.LISTSIZE):
-		# count is only a recommendation
-		body={"size":count,"_source":{"excludes":["attachment.content"]},"track_total_hits":True,"query":{"bool":{"must":{"query_string":{"query":suchstring,"default_operator":"AND","type":"cross_fields","fields":["title.*^5","abstract.*^3","meta.*^10","attachment.content","reference^3"]}}}},"sort":[{"_score":"desc"},{"id":"desc"}],"from": start}
+		filter_object = []
 		if filters:
-			#body['query']['bool']['filter']=json.loads(filters.replace('@','"'))
-			pass
+			for filter in filters:
+				pass
+		# count is only a recommendation
+		body = {
+			"size": count,
+			"_source": {
+				"excludes": ["attachment.content"]
+			},
+			"track_total_hits":True,
+			"query": {
+				"bool": {
+					"filter": filter_object,
+					"must": {
+						"query_string": {
+							"query": suchstring,
+							"default_operator": "AND",
+							"type":"cross_fields",
+							"fields": ["title.*^5","abstract.*^3","meta.*^10","attachment.content","reference^3"]
+						}
+					}
+				}
+			},
+			"sort": [
+				{ "_score": "desc" },
+				{ "id": "desc" }
+			],
+			"from": start
+		}
 		cachekey=suchstring+'#'
 		# Wenn der letzte Eintrag davor bekannt ist, "search_after" verwenden.
 		if start>0 and cachekey in self.cache:
