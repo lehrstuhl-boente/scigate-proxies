@@ -56,9 +56,15 @@ class Adapter():
 				if len(options) > 0:	# only consider filter when at least one checkbox is checked
 					formatted_filters[filter['id']] = options
 			elif filter['type'] == 'date':
-				pass
+				date_from = filter['from']
+				date_to = filter['to']
+				if date_from == '' and date_to == '' or date_from > date_to: continue	# don't add date filter if values are empty or invalid
+				formatted_filters[filter['id']] = {
+					'from': int(date_from),
+					'to': int(date_to)
+				}
 			elif filter['type'] == 'switch':
-				pass
+				pass	# TODO: implmement when first switch is in frontend
 		return formatted_filters
 
 	def suche(self, suchstring, filters):
