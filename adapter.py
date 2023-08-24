@@ -46,7 +46,7 @@ class Adapter():
 		return {'error': fehler}
 			
 	def format_filters(self, filters):
-		formatted_filters = {}
+		formatted_filters = []
 		for filter in filters:
 			if filter['type'] == 'checkbox':
 				options = []
@@ -54,17 +54,16 @@ class Adapter():
 					if option['checked']:
 						options.append(option['name'])
 				if len(options) > 0:	# only consider filter when at least one checkbox is checked
-					formatted_filters[filter['id']] = options
+					formatted_filters.append({
+						'id': filter['id'],
+						'options': options
+					})
 			elif filter['type'] == 'date':
-				date_from = filter['from']
-				date_to = filter['to']
-				if date_from == '' and date_to == '' or date_from > date_to: continue	# don't add date filter if values are empty or invalid
-				formatted_filters[filter['id']] = {
-					'from': int(date_from),
-					'to': int(date_to)
-				}
+				if filter['from'] == '' and filter['to'] == '': continue	# don't add date filter if values are empty or invalid
+				formatted_filters.append(filter)
 			elif filter['type'] == 'switch':
 				pass	# TODO: implmement when first switch is in frontend
+		print(json.dumps(formatted_filters, indent=2))
 		return formatted_filters
 
 	def suche(self, suchstring, filters):
