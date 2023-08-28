@@ -27,6 +27,7 @@ class Entscheidsuche(Adapter):
 	dokumentpfad="/id/eprint/"
 	reStrip=re.compile(r"<br>")
 	disciplines=('law',)
+	availability=('freeOnlineAvailable',)
 	
 	def __init__(self):
 		super().__init__(self.name)
@@ -37,6 +38,10 @@ class Entscheidsuche(Adapter):
 			for filter in filters:
 				if filter['id'] == 'discipline':
 					if set(self.disciplines).isdisjoint(set(filter['options'])):
+						self.addcache(suchstring+'#',start,0,[])
+						return
+				elif filter['id'] == 'availability':
+					if set(self.availability).isdisjoint(set(filter['options'])):
 						self.addcache(suchstring+'#',start,0,[])
 						return
 				elif filter['id'] == 'language':
