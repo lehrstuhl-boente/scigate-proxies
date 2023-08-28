@@ -8,6 +8,7 @@ class Adapter():
 	#Boris kann nichts anderes, da her wird das generell gesetzt.
 	name="unknown"
 	adapters={}
+	parsed_filters = ""
 	
 	def __init__(self,name):
 		self.adapters[name]=self
@@ -17,6 +18,7 @@ class Adapter():
 		status='error'
 		if not 'filters' in command:
 			command['filters']=''
+		self.parsed_filters = self.parse_filters(command['filters'])
 		if 'type' in command:
 			if command['type']=='search':
 				if 'term' in command:
@@ -59,11 +61,14 @@ class Adapter():
 					})
 			elif filter['type'] == 'date':
 				if filter['from'] == '' and filter['to'] == '': continue	# don't add date filter if values are empty
-				# TODO: don't add date filter if 
 				formatted_filters.append(filter)
 			elif filter['type'] == 'switch':
 				pass	# TODO: implmement when first switch is in frontend
 		return formatted_filters
+	
+	def parse_filters(self, filters):
+		for filter in filters:
+			pass
 
 	def suche(self, suchstring, filters):
 		cachekey=suchstring+'#'
