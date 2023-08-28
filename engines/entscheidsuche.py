@@ -3,6 +3,8 @@ import requests
 import json
 import urllib
 import re
+import time
+import datetime
 
 class Entscheidsuche(Adapter):
 	id="entscheidsuche"
@@ -31,9 +33,9 @@ class Entscheidsuche(Adapter):
 	def request(self, suchstring, filters='', start=0, count=Adapter.LISTSIZE):
 		filter_object = []
 		if filters:
-			for filter_id in filters:
-				options = filters[filter_id]
-				if filter_id == 'language':
+			for filter in filters:
+				if filter['id'] == 'language':
+					options = filter['options']
 					if 'unknown' in options:
 						options.remove('unknown')
 					filter_object.append({
@@ -41,15 +43,27 @@ class Entscheidsuche(Adapter):
 							'attachment.language': options
 						}
 					})
-				elif filter_id == 'date':
-					pass
-		print(json.dumps(filter_object, indent=2))
+				elif filter['id'] == 'date':
+					base = { 'range': { 'date': {} } }
+					if filter['from'] != '':
+						date_string = f"01.01.{filter['from']}"
+						date_object = datetime.datetime.strptime(date_string, '%d.%m.%Y')
+						date_object = date_object.replace(tzinfo=datetime.timezone.utc)
+						timestamp = datetime.datetime.timestamp(date_object)	# timestamp in seconds
+						base['range']['date']['gte'] = int(timestamp)*1000	# convert to milliseconds
+					if filter['to'] != '':
+						date_string = f"31.12.{filter['to']}"
+						date_object = datetime.datetime.strptime(date_string, '%d.%m.%Y')
+						date_object = date_object.replace(tzinfo=datetime.timezone.utc)
+						timestamp = datetime.datetime.timestamp(date_object)
+						base['range']['date']['lte'] = int(timestamp)*1000
+					filter_object.append(base)
 		body = {
 			"size": count,
 			"_source": {
 				"excludes": ["attachment.content"]
 			},
-			"track_total_hits":True,
+			"track_total_hits": True,
 			"query": {
 				"bool": {
 					"filter": filter_object,
@@ -58,7 +72,7 @@ class Entscheidsuche(Adapter):
 							"query": suchstring,
 							"default_operator": "AND",
 							"type":"cross_fields",
-							"fields": ["title.*^5","abstract.*^3","meta.*^10","attachment.content","reference^3"]
+							"fields": ["title.*^5", "abstract.*^3", "meta.*^10", "attachment.content", "reference^3"]
 						}
 					}
 				}

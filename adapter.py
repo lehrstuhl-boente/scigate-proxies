@@ -20,7 +20,7 @@ class Adapter():
 		if 'type' in command:
 			if command['type']=='search':
 				if 'term' in command:
-					status, fehler, trefferzahl=self.suche(command['term'], command['filters'])
+					status, fehler, trefferzahl=self.suche(command['term'], self.format_filters(command['filters']))
 					if status=='ok':
 						return {'status': 'ok', 'hits': trefferzahl}
 				else:
@@ -33,8 +33,7 @@ class Adapter():
 					count=10
 					if 'count' in command:
 						count=int(command['count'])
-					filters = self.format_filters(command['filters'])
-					status, fehler, trefferliste = self.treffer(command['term'], filters, start, count)
+					status, fehler, trefferliste = self.treffer(command['term'], self.format_filters(command['filters']), start, count)
 					if status=='ok':
 						return {'status': 'ok', 'hitlist': trefferliste, 'start': start, 'searchterm': command['term'], 'filters': command['filters']}
 				else:
@@ -59,11 +58,11 @@ class Adapter():
 						'options': options
 					})
 			elif filter['type'] == 'date':
-				if filter['from'] == '' and filter['to'] == '': continue	# don't add date filter if values are empty or invalid
+				if filter['from'] == '' and filter['to'] == '': continue	# don't add date filter if values are empty
+				# TODO: don't add date filter if 
 				formatted_filters.append(filter)
 			elif filter['type'] == 'switch':
 				pass	# TODO: implmement when first switch is in frontend
-		print(json.dumps(formatted_filters, indent=2))
 		return formatted_filters
 
 	def suche(self, suchstring, filters):
