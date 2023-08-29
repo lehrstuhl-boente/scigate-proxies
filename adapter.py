@@ -8,7 +8,7 @@ class Adapter():
 	#Boris kann nichts anderes, da her wird das generell gesetzt.
 	name="unknown"
 	adapters={}
-	parsed_filters = ""
+	cachekey = ""
 	
 	def __init__(self,name):
 		self.adapters[name]=self
@@ -18,11 +18,12 @@ class Adapter():
 		status='error'
 		if not 'filters' in command:
 			command['filters']=''
-		self.parsed_filters = self.parse_filters(command['filters'])
+		formatted_filters = self.format_filters(command['filters'])
+		self.cachekey = self.get_cachekey(command['term'], formatted_filters)
 		if 'type' in command:
 			if command['type']=='search':
 				if 'term' in command:
-					status, fehler, trefferzahl=self.suche(command['term'], self.format_filters(command['filters']))
+					status, fehler, trefferzahl=self.suche(command['term'], formatted_filters)
 					if status=='ok':
 						return {'status': 'ok', 'hits': trefferzahl}
 				else:
@@ -35,7 +36,7 @@ class Adapter():
 					count=10
 					if 'count' in command:
 						count=int(command['count'])
-					status, fehler, trefferliste = self.treffer(command['term'], self.format_filters(command['filters']), start, count)
+					status, fehler, trefferliste = self.treffer(command['term'], formatted_filters, start, count)
 					if status=='ok':
 						return {'status': 'ok', 'hitlist': trefferliste, 'start': start, 'searchterm': command['term'], 'filters': command['filters']}
 				else:
@@ -47,31 +48,32 @@ class Adapter():
 		return {'error': fehler}
 			
 	def format_filters(self, filters):
-		formatted_filters = []
-		for filter in filters:
+		formatted_filters = copy.deepcopy(filters)
+		for filter in formatted_filters:
 			if filter['type'] == 'checkbox':
-				options = []
+				formatted_options = []
 				for option in filter['options']:
 					if option['checked']:
-						options.append(option['name'])
-				if len(options) > 0:	# only consider filter when at least one checkbox is checked
-					formatted_filters.append({
-						'id': filter['id'],
-						'options': options
-					})
+						formatted_options.append(option['name'])
+				if len(formatted_options) > 0:	# only consider filter when at least one checkbox is checked
+					filter['options'] = formatted_options
 			elif filter['type'] == 'date':
 				if filter['from'] == '' and filter['to'] == '': continue	# don't add date filter if values are empty
-				formatted_filters.append(filter)
 			elif filter['type'] == 'switch':
 				pass	# TODO: implmement when first switch is in frontend
 		return formatted_filters
 	
-	def parse_filters(self, filters):
+	def get_cachekey(self, suchstring, filters):
+		stringified_filters = []
 		for filter in filters:
-			pass
+			if filter['type'] == 'checkbox':
+				stringified_filters.append(filter['id'] + '=' + ','.join(filter['options']))
+			elif filter['type'] == 'date':
+				stringified_filters.append('from=' + str(filter['from']) + '&to=' + str(filter['to']))
+		return suchstring + '#' + '&'.join(stringified_filters)
 
 	def suche(self, suchstring, filters):
-		cachekey=suchstring+'#'
+		cachekey=self.get_cachekey(suchstring, filters)
 		if cachekey in self.cache:
 			if (datetime.datetime.now()-self.cache[cachekey].zeit).total_seconds()<86000:
 				return "ok", "", self.cache[cachekey].trefferzahl
@@ -87,7 +89,7 @@ class Adapter():
 			return "ok", "", self.cache[cachekey].trefferzahl
 	
 	def treffer(self, suchstring, filters, von=0, zahl=10):
-		cachekey=suchstring+'#'
+		cachekey=self.cachekey
 		if cachekey in self.cache:
 			if (datetime.datetime.now()-self.cache[cachekey].zeit).total_seconds()>86000:
 				del self.cache[cachekey]				

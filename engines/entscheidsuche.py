@@ -38,11 +38,11 @@ class Entscheidsuche(Adapter):
 			for filter in filters:
 				if filter['id'] == 'discipline':
 					if set(self.disciplines).isdisjoint(set(filter['options'])):
-						self.addcache(suchstring+'#',start,0,[])
+						self.addcache(self.cachekey,start,0,[])
 						return
 				elif filter['id'] == 'availability':
 					if set(self.availability).isdisjoint(set(filter['options'])):
-						self.addcache(suchstring+'#',start,0,[])
+						self.addcache(self.cachekey,start,0,[])
 						return
 				elif filter['id'] == 'language':
 					options = filter['options']
@@ -93,7 +93,7 @@ class Entscheidsuche(Adapter):
 			],
 			"from": start
 		}
-		cachekey=suchstring+'#'
+		cachekey=self.cachekey
 		# Wenn der letzte Eintrag davor bekannt ist, "search_after" verwenden.
 		if start>0 and cachekey in self.cache:
 			treffercache=self.cache[cachekey].trefferliste
@@ -124,5 +124,5 @@ class Entscheidsuche(Adapter):
 				'url': url,
 				'sort': sort
 			})
-		self.addcache(suchstring+'#',start,treffer,trefferliste)
+		self.addcache(self.cachekey,start,treffer,trefferliste)
 		return	

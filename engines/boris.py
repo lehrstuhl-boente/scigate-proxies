@@ -74,5 +74,5 @@ class Boris(Adapter):
 					'url': url
 				})
 
-		self.addcache(suchstring+'#',start,trefferzahl,trefferliste)
+		self.addcache(self.cachekey,start,trefferzahl,trefferliste)
 		return

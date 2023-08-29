@@ -84,5 +84,4 @@ class Fedlex(Adapter):
 				'description':[zeile1, zeile2, zeile3],
 				'url': urllib.parse.unquote(url)
 			})
-		self.addcache(suchwort+'#',start,treffer,trefferliste)	
-		return	
+		self.addcache(self.cachekey,start,treffer,trefferliste)

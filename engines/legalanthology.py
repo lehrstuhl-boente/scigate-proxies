@@ -52,4 +52,4 @@ class Legalanthology(Adapter):
         "description": [zeile1, zeile2, zeile3],
         "url": dokument['link']
       })
-    self.addcache(suchstring+'#',start,treffer,trefferliste)
+    self.addcache(self.cachekey,start,treffer,trefferliste)
