@@ -125,4 +125,3 @@ class Entscheidsuche(Adapter):
 				'sort': sort
 			})
 		self.addcache(self.cachekey,start,treffer,trefferliste)
-		return	
