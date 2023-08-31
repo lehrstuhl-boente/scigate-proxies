@@ -48,8 +48,8 @@ class Adapter():
 		return {'error': fehler}
 			
 	def format_filters(self, filters):
-		formatted_filters = copy.deepcopy(filters)
-		for filter in formatted_filters:
+		formatted_filters = []
+		for filter in filters:
 			if filter['type'] == 'checkbox':
 				formatted_options = []
 				for option in filter['options']:
@@ -57,8 +57,10 @@ class Adapter():
 						formatted_options.append(option['name'])
 				if len(formatted_options) > 0:	# only consider filter when at least one checkbox is checked
 					filter['options'] = formatted_options
+					formatted_filters.append(filter)
 			elif filter['type'] == 'date':
-				if filter['from'] == '' and filter['to'] == '': continue	# don't add date filter if values are empty
+				if filter['from'] != '' or filter['to'] != '':
+					formatted_filters.append(filter)	# don't add date filter if values are empty
 			elif filter['type'] == 'switch':
 				pass	# TODO: implmement when first switch is in frontend
 		return formatted_filters
