@@ -27,7 +27,9 @@ class Digitalisierungszentrum(Adapter):
         elif filter['id'] == 'language':
           pass
         elif filter['id'] == 'availability':
-          pass
+          if 'freeOnlineAvailable' not in filter['options']:
+            self.addcache(self.cachekey,start,0,[])
+            return
         elif filter['id'] == 'date':
           pass
     urlsuchstring = urllib.parse.quote_plus(suchstring)
