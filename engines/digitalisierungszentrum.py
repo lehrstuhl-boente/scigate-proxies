@@ -3,6 +3,7 @@ from adapter import Adapter
 import requests
 import json
 import re
+import datetime
 
 class Digitalisierungszentrum(Adapter):
   id="digitalisierungszentrum"
@@ -34,7 +35,13 @@ class Digitalisierungszentrum(Adapter):
             self.addcache(self.cachekey,start,0,[])
             return
         elif filter['id'] == 'date':
-          pass
+          filter_from = str(filter['from']).zfill(4)
+          filter_to = str(filter['to']).zfill(4)
+          if filter['from'] == '':
+            filter_from = '0100'
+          if filter['to'] == '':
+            filter_to = datetime.now().year
+          self.arguments += f'&filter=date_facet:[{filter_from}-01-01+TO+{filter_to}-12-31]'
     urlsuchstring = urllib.parse.quote_plus(suchstring)
     sort_field = "relevancy"
     sort_order = "asc"
