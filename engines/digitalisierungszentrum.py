@@ -10,12 +10,26 @@ class Digitalisierungszentrum(Adapter):
   headers = {}
   host = "https://www.digitale-sammlungen.de"
   suchpfad="/api/search"
+  #                                                                                 filter=language_bib:"de"&filter=language_bib:"fr"&filter=date_facet:[1600-01-01+TO+2022-12-31]
+  #          ?query=vertrag&handler=simple-all&ocrContext=1&startPage=0&pageSize=10&filter=language_bib%3A%22de%22&filter=language_bib%3A%22fr%22&filter=language_bib%3A%22it%22&filter=language_bib%3A%22en%22&filter=date_facet%3A%5B1600-01-01+TO+2022-12-31%5D
   arguments="?query={suchterm}&handler=simple-all&ocrContext=1&sortField={sort_field}&sortOrder={sort_order}&startPage={page}&pageSize={count}"
 
   def __init__(self):
     super().__init__(self.name)
 
   def request(self, suchstring, filters='', start=0, count=Adapter.LISTSIZE):
+    if filters:
+      for filter in filters:
+        if filter['id'] == 'discipline':
+          if 'unknown' not in filter['options']:
+            self.addcache(self.cachekey,start,0,[])
+            return
+        elif filter['id'] == 'language':
+          pass
+        elif filter['id'] == 'availability':
+          pass
+        elif filter['id'] == 'date':
+          pass
     urlsuchstring = urllib.parse.quote_plus(suchstring)
     sort_field = "relevancy"
     sort_order = "asc"
