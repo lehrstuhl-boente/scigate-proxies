@@ -42,7 +42,7 @@ class Fedlex(Adapter):
 		rs=json.loads(response.text)
 		if not 'hits' in rs:
 			return "no valid response"
-		treffer=rs['hits']['total']['value']
+		treffer=rs['aggregations']['result_count']['value']
 		trefferliste=[]
 		for dokument in rs['hits']['hits']:
 			z=[]
