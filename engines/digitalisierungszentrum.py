@@ -25,7 +25,10 @@ class Digitalisierungszentrum(Adapter):
             self.addcache(self.cachekey,start,0,[])
             return
         elif filter['id'] == 'language':
-          pass
+          for language in filter['options']:
+            if language == 'unknown':
+              language = 'und'
+            self.arguments += f'&filter=language_bib:"{language}"'
         elif filter['id'] == 'availability':
           if 'freeOnlineAvailable' not in filter['options']:
             self.addcache(self.cachekey,start,0,[])
