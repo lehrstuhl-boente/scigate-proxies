@@ -56,13 +56,15 @@ class Entscheidsuche(Adapter):
 				elif filter['id'] == 'date':
 					base = { 'range': { 'date': {} } }
 					if filter['from'] != '':
-						date_string = f"01.01.{filter['from']}"
+						filter_from = str(filter['from']).zfill(4)
+						date_string = f"01.01.{filter_from}"
 						date_object = datetime.datetime.strptime(date_string, '%d.%m.%Y')
 						date_object = date_object.replace(tzinfo=datetime.timezone.utc)
 						timestamp = datetime.datetime.timestamp(date_object)	# timestamp in seconds
 						base['range']['date']['gte'] = int(timestamp)*1000	# convert to milliseconds
 					if filter['to'] != '':
-						date_string = f"31.12.{filter['to']}"
+						filter_to = str(filter['to']).zfill(4)
+						date_string = f"31.12.{filter_to}"
 						date_object = datetime.datetime.strptime(date_string, '%d.%m.%Y')
 						date_object = date_object.replace(tzinfo=datetime.timezone.utc)
 						timestamp = datetime.datetime.timestamp(date_object)
