@@ -675,11 +675,15 @@ class Fedlex(Adapter):
 		if filters:
 			for filter in filters:
 				if filter['id'] == 'discipline':
-					pass
+					if 'law' not in filter['options']:
+						self.addcache(self.cachekey,start,0,[])
+						return
 				elif filter['id'] == 'language':
 					pass
 				elif filter['id'] == 'availability':
-					pass
+					if 'freeOnlineAvailable' not in filter['options']:
+						self.addcache(self.cachekey,start,0,[])
+						return
 				elif filter['id'] == 'date':
 					filter_from = filter['from']
 					filter_to = filter['to']
