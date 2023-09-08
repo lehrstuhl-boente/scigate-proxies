@@ -2,7 +2,7 @@ from adapter import Adapter
 import requests
 import json
 import urllib
-import re
+import datetime
 
 class Fedlex(Adapter):
 	id="fedlex"
@@ -28,16 +28,6 @@ class Fedlex(Adapter):
 		super().__init__(self.name)
 		
 	def request(self, suchwort, filters='',start=0,count=Adapter.LISTSIZE):
-		if filters:
-			for filter in filters:
-				if filter['id'] == 'discipline':
-					pass
-				elif filter['id'] == 'language':
-					pass
-				elif filter['id'] == 'availability':
-					pass
-				elif filter['id'] == 'date':
-					pass 
 		body = {
 			"size": count,
 			"from": start,
@@ -681,6 +671,72 @@ class Fedlex(Adapter):
 				}
 			}
 		}
+		
+		if filters:
+			for filter in filters:
+				if filter['id'] == 'discipline':
+					pass
+				elif filter['id'] == 'language':
+					pass
+				elif filter['id'] == 'availability':
+					pass
+				elif filter['id'] == 'date':
+					filter_from = filter['from']
+					filter_to = filter['to']
+					if filter_from == '':
+						filter_from = '2000'
+					if filter_to == '':
+						filter_to = str(datetime.now().year)
+					body['query']['bool']['must'].append({
+						"bool": {
+							"should": [
+								{
+									"bool": {
+										"must": {
+											"range": {
+												"data.attributes.publicationDate.xsd:date": { "lte": f"{filter_to}-12-31", "gte": f"{filter_from}-01-01" }
+											}
+										}
+									}
+								},
+								{
+									"bool": {
+										"must": {
+											"range": {
+												"data.attributes.dateApplicability.xsd:date": { "lte": f"{filter_to}-12-31", "gte": f"{filter_from}-01-01" }
+											}
+										}
+									}
+								},
+								{
+									"bool": {
+										"must": {
+											"range": {
+												"data.attributes.treatySignatureDate.xsd:date": { "lte": f"{filter_to}-12-31", "gte": f"{filter_from}-01-01" }
+											}
+										}
+									}
+								},
+								{
+									"bool": {
+										"must": {
+											"range": { "data.attributes.eventStartDate.xsd:date": { "lte": f"{filter_to}-12-31", "gte": f"{filter_from}-01-01" } }
+										}
+									}
+								},
+								{
+									"bool": {
+										"must": {
+											"range": {
+												"data.attributes.foreseenEventStartDate.xsd:date": { "lte": f"{filter_to}-12-31", "gte": f"{filter_from}-01-01" }
+											}
+										}
+									}
+								}
+							],
+							"minimum_should_match": 1
+						}
+					})
 		da_uu=json.dumps(body)
 		da_ascii=da_uu.encode('utf-8')
 
