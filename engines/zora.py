@@ -30,7 +30,22 @@ class Zora(Adapter):
 		if filters:
 			for filter in filters:
 				if filter['id'] == 'discipline':
-					pass
+					discipline_mappings = { 'law': '340 Recht' }
+					discipline_filters = []
+					for option in filter['options']:
+						if option == 'unknown':
+							if len(filter['options']) == 1: # unknown is the only selected option
+								self.addcache(self.cachekey,start,0,[])
+								return
+							else:
+								continue	# just ignore it
+						if option not in discipline_mappings.keys(): continue
+						discipline_filters.append({ "term": { "agg_dewey_de": discipline_mappings[option] } })
+					zora_filters.append({
+						'bool': {
+							'should': discipline_filters
+						}
+					})
 				elif filter['id'] == 'language':
 					pass
 				elif filter['id'] == 'availability':
