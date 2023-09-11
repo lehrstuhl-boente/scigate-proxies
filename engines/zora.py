@@ -62,7 +62,26 @@ class Zora(Adapter):
 						}
 					})
 				elif filter['id'] == 'availability':
-					pass
+					availability_mappings = {
+            'freeOnlineAvailable': ['Open Access'],
+            'restrictedOnlineAvailable': ['Nur für UZH-Angehörige', 'Nach Ablauf des Embargos'],
+            'notOnlineAvailable': ['Kein Zugang']
+          }
+					availability_filters = []
+					for option in filter['options']:
+						if option == 'unknown': continue
+						if option not in availability_mappings.keys(): continue
+						for key in availability_mappings[option]:
+							availability_filters.append({ 'term': { 'agg_accessrights_de': key } })
+					if len(availability_filters) == 0:
+						self.addcache(self.cachekey,start,0,[])
+						return
+					zora_filters.append({
+						'bool': {
+							'should': availability_filters,
+							'minimum_should_match': 1
+						}
+					})
 				elif filter['id'] == 'date':
 					pass
 		# count is only a recommendation
