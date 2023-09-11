@@ -33,21 +33,34 @@ class Zora(Adapter):
 					discipline_mappings = { 'law': '340 Recht' }
 					discipline_filters = []
 					for option in filter['options']:
-						if option == 'unknown':
-							if len(filter['options']) == 1: # unknown is the only selected option
-								self.addcache(self.cachekey,start,0,[])
-								return
-							else:
-								continue	# just ignore it
+						if option == 'unknown': continue
 						if option not in discipline_mappings.keys(): continue
-						discipline_filters.append({ "term": { "agg_dewey_de": discipline_mappings[option] } })
+						discipline_filters.append({ 'term': { 'agg_dewey_de': discipline_mappings[option] } })
+					if len(discipline_filters) == 0:
+						self.addcache(self.cachekey,start,0,[])
+						return
 					zora_filters.append({
 						'bool': {
-							'should': discipline_filters
+							'should': discipline_filters,
+							'minimum_should_match': 1
 						}
 					})
 				elif filter['id'] == 'language':
-					pass
+					language_mappings = { 'de': 'Deutsch', 'fr': 'Französisch', 'en': 'Englisch', 'it': 'Italienisch' }
+					language_filters = []
+					for option in filter['options']:
+						if option == 'unknown': continue
+						if option not in language_mappings.keys(): continue
+						language_filters.append({ 'term': { 'agg_language_de': language_mappings[option] } })
+					if len(language_filters) == 0:
+						self.addcache(self.cachekey,start,0,[])
+						return
+					zora_filters.append({
+						'bool': {
+							'should': language_filters,
+							'minimum_should_match': 1
+						}
+					})
 				elif filter['id'] == 'availability':
 					pass
 				elif filter['id'] == 'date':
