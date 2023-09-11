@@ -671,7 +671,6 @@ class Fedlex(Adapter):
 				}
 			}
 		}
-		
 		if filters:
 			for filter in filters:
 				if filter['id'] == 'discipline':
