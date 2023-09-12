@@ -23,7 +23,6 @@ class Boris(Adapter):
 	}
 	host="https://boris.unibe.ch"
 	suchpfad="/cgi/search/archive/simple"
-	arguments="?screen=Search&order=&q={suchterm}&_action_search=Search&dataset=archive"
 	arguments="?exp=0|1||archive|-|q::ALL:IN:{suchterm}|-|&_action_search=1&order=&screen=Search&search_offset={start}"
 	dokumentpfad="/id/eprint/"
 	leerplatz=re.compile(r'[\n\r\s]+')
@@ -35,7 +34,9 @@ class Boris(Adapter):
 		if filters:
 			for filter in filters:
 				if filter['id'] == 'discipline':
-					pass
+					if 'unknown' not in filter['options']:
+						self.addcache(self.cachekey,start,0,[])
+						return 
 				elif filter['id'] == 'language':
 					if 'unknown' not in filter['options']:
 						self.addcache(self.cachekey,start,0,[])
