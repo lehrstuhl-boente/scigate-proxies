@@ -41,7 +41,9 @@ class Boris(Adapter):
 						self.addcache(self.cachekey,start,0,[])
 						return
 				elif filter['id'] == 'availability':
-					pass
+					if 'unknown' not in filter['options']:
+						self.addcache(self.cachekey,start,0,[])
+						return
 				elif filter['id'] == 'date':
 					pass
 
