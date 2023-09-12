@@ -689,7 +689,7 @@ class Fedlex(Adapter):
 					if filter_from == '':
 						filter_from = '2000'
 					if filter_to == '':
-						filter_to = str(datetime.now().year)
+						filter_to = str(datetime.date.today().year)
 					body['query']['bool']['must'].append({
 						"bool": {
 							"should": [

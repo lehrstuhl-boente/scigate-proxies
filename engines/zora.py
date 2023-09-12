@@ -90,7 +90,7 @@ class Zora(Adapter):
 					if filter_from == '':
 						filter_from = 1994
 					if filter_to == '':
-						filter_to = datetime.now().year
+						filter_to = datetime.date.today().year
 					for year in range(filter_from, filter_to+1):
 						date_filters.append({ 'term': { 'agg_pubyear_key': str(year) } })
 					zora_filters.append({

@@ -38,7 +38,7 @@ class Digitalisierungszentrum(Adapter):
           if filter['from'] == '':
             filter_from = '0100'
           if filter['to'] == '':
-            filter_to = datetime.now().year
+            filter_to = datetime.date.today().year
           self.arguments += f'&filter=date_facet:[{filter_from}-01-01+TO+{filter_to}-12-31]'
     urlsuchstring = urllib.parse.quote_plus(suchstring)
     sort_field = "relevancy"
