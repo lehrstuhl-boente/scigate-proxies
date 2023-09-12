@@ -20,6 +20,25 @@ class Repositorium(Adapter):
 		super().__init__(self.name)
 
 	def request(self, suchstring, filters='', start=0, count=Adapter.LISTSIZE):
+		if filters:
+			for filter in filters:
+				if filter['id'] == 'discipline':
+					if 'law' not in filter['options']:
+						self.addcache(self.cachekey,start,0,[])
+						return
+				elif filter['id'] == 'language':
+					if 'unknown' not in filter['options']:
+						self.addcache(self.cachekey,start,0,[])
+						return
+				elif filter['id'] == 'availability':
+					if 'freeOnlineAvailable' not in filter['options']:
+						self.addcache(self.cachekey,start,0,[])
+						return
+				elif filter['id'] == 'date':
+					if filter['from'] != '' and filter['to'] != '':
+						self.addcache(self.cachekey,start,0,[])
+						return
+
 		urlsuchstring=urllib.parse.quote_plus(suchstring)
 		argumente = self.arguments.format(suchterm=urlsuchstring)
 		response=requests.get(url=self.host+self.suchpfad+argumente, headers=self.headers)
