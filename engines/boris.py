@@ -32,6 +32,19 @@ class Boris(Adapter):
 		super().__init__(self.name)
 
 	def request(self, suchstring, filters='', start=0, count=Adapter.LISTSIZE):
+		if filters:
+			for filter in filters:
+				if filter['id'] == 'discipline':
+					pass
+				elif filter['id'] == 'language':
+					if 'unknown' not in filter['options']:
+						self.addcache(self.cachekey,start,0,[])
+						return
+				elif filter['id'] == 'availability':
+					pass
+				elif filter['id'] == 'date':
+					pass
+
 		# count is ignored here
 		urlsuchstring=urllib.parse.quote_plus(suchstring)
 		argumente=self.arguments.format(start=start, suchterm=urlsuchstring)
