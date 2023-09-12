@@ -35,7 +35,7 @@ class Repositorium(Adapter):
 						self.addcache(self.cachekey,start,0,[])
 						return
 				elif filter['id'] == 'date':
-					if filter['from'] != '' and filter['to'] != '':
+					if filter['from'] != '' or filter['to'] != '':
 						self.addcache(self.cachekey,start,0,[])
 						return
 
@@ -44,7 +44,7 @@ class Repositorium(Adapter):
 		response=requests.get(url=self.host+self.suchpfad+argumente, headers=self.headers)
 
 		if response.status_code >= 300:
-			return "http-response: "+str(response.status_code)
+			return 'http-response: ' + str(response.status_code)
     
 		rs=json.loads(response.text)
 		treffer=len(rs)
