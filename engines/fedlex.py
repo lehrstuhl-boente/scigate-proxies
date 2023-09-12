@@ -686,7 +686,7 @@ class Fedlex(Adapter):
 				elif filter['id'] == 'date':
 					filter_from = filter['from']
 					filter_to = filter['to']
-					if filter_from == '':
+					if filter_from == '' or filter_from < 2000:
 						filter_from = '2000'
 					if filter_to == '':
 						filter_to = str(datetime.date.today().year)
