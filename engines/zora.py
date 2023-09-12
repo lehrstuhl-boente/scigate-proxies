@@ -1,6 +1,7 @@
 from adapter import Adapter
 import requests
 import json
+import datetime
 
 class Zora(Adapter):
 	id="zora"
@@ -83,7 +84,21 @@ class Zora(Adapter):
 						}
 					})
 				elif filter['id'] == 'date':
-					pass
+					date_filters = []
+					filter_from = filter['from']
+					filter_to = filter['to']
+					if filter_from == '':
+						filter_from = 1994
+					if filter_to == '':
+						filter_to = datetime.now().year
+					for year in range(filter_from, filter_to+1):
+						date_filters.append({ 'term': { 'agg_pubyear_key': str(year) } })
+					zora_filters.append({
+						'bool': {
+							'should': date_filters,
+							'minimum_should_match': 1
+						}
+					})
 		# count is only a recommendation
 		body={
 			"highlight": {
