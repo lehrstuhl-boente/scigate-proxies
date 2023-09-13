@@ -43,7 +43,7 @@ class GoTriple(Adapter):
           for option in filter['options']:
             availabilities.append(availability_mappings[option])
           access = ','.join(availabilities)
-        elif filter['id'] == 'date':
+        elif filter['id'] == 'year':
           filter_from = filter['from']
           filter_to = filter['to']
     urlsuchstring = urllib.parse.quote_plus(suchstring)

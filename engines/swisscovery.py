@@ -30,6 +30,17 @@ class Swisscovery(Adapter):
 		super().__init__(self.name)
 
 	def request(self, suchstring, filters='', start=0,count=Adapter.LISTSIZE):
+		if filters:
+			for filter in filters:
+				if filter['id'] == 'discipline':
+					pass
+				elif filter['id'] == 'language':
+					pass
+				elif filter['id'] == 'availability':
+					pass
+				elif filter['id'] == 'year':	# TODO: implement year filter
+					pass
+
 		# count is only a recommendation
 		urlsuchstring=urllib.parse.quote_plus(suchstring)
 		argumente=self.arguments.format(count=count, start=start, suchterm=urlsuchstring)	

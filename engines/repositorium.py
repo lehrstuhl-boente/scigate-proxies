@@ -34,7 +34,7 @@ class Repositorium(Adapter):
 					if 'freeOnlineAvailable' not in filter['options']:
 						self.addcache(self.cachekey,start,0,[])
 						return
-				elif filter['id'] == 'date':
+				elif filter['id'] == 'year':
 					if filter['from'] != '' or filter['to'] != '':
 						self.addcache(self.cachekey,start,0,[])
 						return

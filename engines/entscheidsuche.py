@@ -53,7 +53,7 @@ class Entscheidsuche(Adapter):
 							'attachment.language': options
 						}
 					})
-				elif filter['id'] == 'date':
+				elif filter['id'] == 'year':
 					base = { 'range': { 'date': {} } }
 					if filter['from'] != '':
 						filter_from = str(filter['from']).zfill(4)

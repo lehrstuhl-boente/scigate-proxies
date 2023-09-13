@@ -683,7 +683,7 @@ class Fedlex(Adapter):
 					if 'freeOnlineAvailable' not in filter['options']:
 						self.addcache(self.cachekey,start,0,[])
 						return
-				elif filter['id'] == 'date':
+				elif filter['id'] == 'year':
 					filter_from = filter['from']
 					filter_to = filter['to']
 					if filter_from == '' or filter_from < 2000:
