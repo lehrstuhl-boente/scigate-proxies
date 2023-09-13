@@ -45,8 +45,10 @@ class Boris(Adapter):
 					if 'unknown' not in filter['options']:
 						self.addcache(self.cachekey,start,0,[])
 						return
-				elif filter['id'] == 'date':
-					pass
+				elif filter['id'] == 'date':	# TODO: implement date filter
+					if filter['from'] != '' or filter['to'] != '':
+						self.addcache(self.cachekey,start,0,[])
+						return
 
 		# count is ignored here
 		urlsuchstring=urllib.parse.quote_plus(suchstring)
