@@ -12,8 +12,9 @@ from engines.swisslexGreen import SwisslexGreen
 from engines.legalanthology import Legalanthology
 from engines.digitalisierungszentrum import Digitalisierungszentrum
 from engines.gotriple import GoTriple
+from engines.iurisprudentia import Iurisprudentia
 
-hostName=""
+hostName="localhost"
 serverPort=8080
 
 class MyServer(BaseHTTPRequestHandler):
@@ -58,7 +59,8 @@ class MyServer(BaseHTTPRequestHandler):
 					SwisslexGreen(),
 					Legalanthology(),
 					Digitalisierungszentrum(),
-					GoTriple()
+					GoTriple(),
+					Iurisprudentia()
 				]
 				engineUnknown = True
 				engine: Adapter	# type hint

@@ -8,20 +8,22 @@ class Adapter():
 	#Boris kann nichts anderes, da her wird das generell gesetzt.
 	name="unknown"
 	adapters={}
+	cachekey = ""
 	
 	def __init__(self,name):
 		self.adapters[name]=self
 		self.cache={}
 	
 	def execute(self, command):
-		print("execute: "+json.dumps(command))
 		status='error'
-		if not 'filter' in command:
-			command['filter']=''
+		if not 'filters' in command:
+			command['filters']=''
+		formatted_filters = self.format_filters(command['filters'])
+		self.cachekey = self.get_cachekey(command['term'], formatted_filters)
 		if 'type' in command:
 			if command['type']=='search':
 				if 'term' in command:
-					status, fehler, trefferzahl=self.suche(command['term'], command['filter'])
+					status, fehler, trefferzahl=self.suche(command['term'], formatted_filters)
 					if status=='ok':
 						return {'status': 'ok', 'hits': trefferzahl}
 				else:
@@ -34,9 +36,9 @@ class Adapter():
 					count=10
 					if 'count' in command:
 						count=int(command['count'])
-					status, fehler, trefferliste = self.treffer(command['term'], command['filter'], start, count)
+					status, fehler, trefferliste = self.treffer(command['term'], formatted_filters, start, count)
 					if status=='ok':
-						return {'status': 'ok', 'hitlist': trefferliste, 'start': start, 'searchterm': command['term'], 'filter': command['filter']}
+						return {'status': 'ok', 'hitlist': trefferliste, 'start': start, 'searchterm': command['term'], 'filters': command['filters']}
 				else:
 					fehler='no searchterm given'
 			else:
@@ -45,30 +47,59 @@ class Adapter():
 			fehler='no command type given'
 		return {'error': fehler}
 			
-	def suche(self, suchstring, filter):
-		cachekey=suchstring+'#'+filter
+	def format_filters(self, filters):
+		formatted_filters = []
+		for filter in filters:
+			if filter['type'] == 'checkbox':
+				formatted_options = []
+				for option in filter['options']:
+					if option['checked']:
+						formatted_options.append(option['name'])
+				if len(formatted_options) > 0:	# only consider filter when at least one checkbox is checked
+					filter['options'] = formatted_options
+					formatted_filters.append(filter)
+			elif filter['type'] == 'date':
+				if filter['from'] != '' or filter['to'] != '':
+					formatted_filters.append(filter)	# don't add date filter if values are empty
+			elif filter['type'] == 'switch':
+				pass	# TODO: implmement when first switch is in frontend
+		return formatted_filters
+	
+	def get_cachekey(self, suchstring, filters):
+		stringified_filters = []
+		for filter in filters:
+			if filter['type'] == 'checkbox':
+				stringified_filters.append(filter['id'] + '=' + ','.join(filter['options']))
+			elif filter['type'] == 'date':
+				stringified_filters.append('from=' + str(filter['from']) + '&to=' + str(filter['to']))
+		return suchstring + '#' + '&'.join(stringified_filters)
+
+	def suche(self, suchstring, filters):
+		cachekey=self.get_cachekey(suchstring, filters)
 		if cachekey in self.cache:
 			if (datetime.datetime.now()-self.cache[cachekey].zeit).total_seconds()<86000:
 				return "ok", "", self.cache[cachekey].trefferzahl
 			else:
 				del self.cache[cachekey]
 
-		fehler=self.request(suchstring, filter)
+		# apply engine-wide filters here
+
+		fehler=self.request(suchstring, filters)
 		if fehler:
 			return "error", fehler, 0
 		else:
 			return "ok", "", self.cache[cachekey].trefferzahl
 	
-	def treffer(self, suchstring, filter, von=0, zahl=10):
-		cachekey=suchstring+'#'+filter
+	def treffer(self, suchstring, filters, von=0, zahl=10):
+		cachekey=self.cachekey
 		if cachekey in self.cache:
 			if (datetime.datetime.now()-self.cache[cachekey].zeit).total_seconds()>86000:
 				del self.cache[cachekey]				
-				fehler=self.request(suchstring, filter, von, min(self.LISTSIZE,zahl))
+				fehler=self.request(suchstring, filters, von, min(self.LISTSIZE,zahl))
 				if fehler:
 					return "error", fehler, []
 		else:
-			fehler=self.request(suchstring, filter, von, min(self.LISTSIZE,zahl))
+			fehler=self.request(suchstring, filters, von, min(self.LISTSIZE,zahl))
 			if fehler:
 				return "error", fehler, []
 		
@@ -81,20 +112,21 @@ class Adapter():
 			ergebnis=[]
 			while i<min(von+zahl,trefferzahl):
 				if i not in treffercache:
-					fehler=self.request(suchstring, filter, i, max(self.LISTSIZE,zahl-(i-von)))
+					fehler=self.request(suchstring, filters, i, max(self.LISTSIZE,zahl-(i-von)))
 					if fehler:
 						return "error", fehler, []
 					treffercache=self.cache[cachekey].trefferliste 
 				if i in treffercache:
 					ergebnis.append(treffercache[i])
 				else:
-					print("Treffer "+str(i)+" nicht erhalten.")
+					#print("Treffer "+str(i)+" nicht erhalten.")
+					pass
 				i+=1
-			print("Für Suchanfrage '"+cachekey+"' "+str(trefferzahl)+" Treffer gefunden und ab Position "+str(von)+" "+str(len(ergebnis))+" Ergebnisse zurückgegeben.")
+			#print("Für Suchanfrage '"+cachekey+"' "+str(trefferzahl)+" Treffer gefunden und ab Position "+str(von)+" "+str(len(ergebnis))+" Ergebnisse zurückgegeben.")
 			return "ok","",ergebnis
 						
 	def addcache(self, cachekey, start,treffer,trefferliste):
-		print("Addcache ab "+str(start)+" mit "+str(len(trefferliste))+" Treffern in der Liste.")
+		#print("Addcache ab "+str(start)+" mit "+str(len(trefferliste))+" Treffern in der Liste.")
 		if cachekey in self.cache:
 			if self.cache[cachekey].update(cachekey, treffer, trefferliste, start):
 				del self.cache[cachekey]

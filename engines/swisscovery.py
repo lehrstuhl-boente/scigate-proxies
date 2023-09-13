@@ -31,7 +31,6 @@ class Swisscovery(Adapter):
 
 	def request(self, suchstring, filters='', start=0,count=Adapter.LISTSIZE):
 		# count is only a recommendation
-		# print("Start Swisscovery-Request")
 		urlsuchstring=urllib.parse.quote_plus(suchstring)
 		argumente=self.arguments.format(count=count, start=start, suchterm=urlsuchstring)	
 		response=requests.get(url=self.host+self.suchpfad+argumente, headers=self.headers)
@@ -59,7 +58,6 @@ class Swisscovery(Adapter):
 					zeile3=dokument['pnx']['addata']['date'][0]
 					
 			docid=dokument['pnx']['control']['recordid'][0]
-			#print(json.dumps(dokument['pnx']['control']['recordid']))
 			context="XXX"
 			if 'context' in dokument:
 				context=dokument['context']
@@ -71,6 +69,4 @@ class Swisscovery(Adapter):
 				'description': [zeile1, zeile2, zeile3],
 				'url': url
 			})
-		self.addcache(suchstring+'#',start,treffer,trefferliste)
-		# print("Ende Swisscovery-Request")		
-		return
+		self.addcache(self.cachekey,start,treffer,trefferliste)

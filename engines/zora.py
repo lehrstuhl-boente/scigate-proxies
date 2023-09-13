@@ -1,6 +1,7 @@
 from adapter import Adapter
 import requests
 import json
+import datetime
 
 class Zora(Adapter):
 	id="zora"
@@ -26,9 +27,144 @@ class Zora(Adapter):
 		super().__init__(self.name)
 		
 	def request(self, suchstring, filters='', start=0,count=Adapter.LISTSIZE):
+		zora_filters = []
+		if filters:
+			for filter in filters:
+				if filter['id'] == 'discipline':
+					discipline_mappings = { 'law': '340 Recht' }
+					discipline_filters = []
+					for option in filter['options']:
+						if option == 'unknown': continue
+						if option not in discipline_mappings.keys(): continue
+						discipline_filters.append({ 'term': { 'agg_dewey_de': discipline_mappings[option] } })
+					if len(discipline_filters) == 0:
+						self.addcache(self.cachekey,start,0,[])
+						return
+					zora_filters.append({
+						'bool': {
+							'should': discipline_filters,
+							'minimum_should_match': 1
+						}
+					})
+				elif filter['id'] == 'language':
+					language_mappings = { 'de': 'Deutsch', 'fr': 'Französisch', 'en': 'Englisch', 'it': 'Italienisch' }
+					language_filters = []
+					for option in filter['options']:
+						if option == 'unknown': continue
+						if option not in language_mappings.keys(): continue
+						language_filters.append({ 'term': { 'agg_language_de': language_mappings[option] } })
+					if len(language_filters) == 0:
+						self.addcache(self.cachekey,start,0,[])
+						return
+					zora_filters.append({
+						'bool': {
+							'should': language_filters,
+							'minimum_should_match': 1
+						}
+					})
+				elif filter['id'] == 'availability':
+					availability_mappings = {
+            'freeOnlineAvailable': ['Open Access'],
+            'restrictedOnlineAvailable': ['Nur für UZH-Angehörige', 'Nach Ablauf des Embargos'],
+            'notOnlineAvailable': ['Kein Zugang']
+          }
+					availability_filters = []
+					for option in filter['options']:
+						if option == 'unknown': continue
+						if option not in availability_mappings.keys(): continue
+						for key in availability_mappings[option]:
+							availability_filters.append({ 'term': { 'agg_accessrights_de': key } })
+					if len(availability_filters) == 0:
+						self.addcache(self.cachekey,start,0,[])
+						return
+					zora_filters.append({
+						'bool': {
+							'should': availability_filters,
+							'minimum_should_match': 1
+						}
+					})
+				elif filter['id'] == 'date':
+					date_filters = []
+					filter_from = filter['from']
+					filter_to = filter['to']
+					if filter_from == '':
+						filter_from = 1994
+					if filter_to == '':
+						filter_to = datetime.date.today().year
+					for year in range(filter_from, filter_to+1):
+						date_filters.append({ 'term': { 'agg_pubyear_key': str(year) } })
+					zora_filters.append({
+						'bool': {
+							'should': date_filters,
+							'minimum_should_match': 1
+						}
+					})
 		# count is only a recommendation
-		# print("Start Zora-Request")
-		body={"highlight":{"fragment_size":400,"number_of_fragments":1,"fields":{"metadata.eprint.title.*":{"number_of_fragments":1,"fragment_size":400},"metadata.eprint.abstract.*":{"number_of_fragments":1,"fragment_size":400},"fulltext.eprint.fulltext.*":{"number_of_fragments":1,"fragment_size":400},"citation.eprint.*":{"number_of_fragments":1,"fragment_size":10000}}},"_source":["id","fulltext.eprint.security","metadata.eprint.title","citation.eprint.es_title","citation.eprint.es_publication","citation.eprint.es_contributors"],"aggs":{},"export_plugin_selected":"false","query":{"bool":{"must":[{"query_string":{"query":suchstring,"default_operator":"AND"}},{"nested":{"path":"metadata.eprint.eprint_status","query":{"bool":{"must":[{"term":{"metadata.eprint.eprint_status.key":"archive"}}]}}}}],"filter":[{"bool":{"should":[{"term":{"agg_dewey_en":"340 Law"}}],"minimum_should_match":1}}]}},"size":count,"from":start}
+		body={
+			"highlight": {
+				"fragment_size":400,
+				"number_of_fragments":1,
+				"fields": {
+					"metadata.eprint.title.*": {
+						"number_of_fragments":1,
+						"fragment_size":400
+					},
+					"metadata.eprint.abstract.*": {
+						"number_of_fragments":1,
+						"fragment_size":400
+					},
+					"fulltext.eprint.fulltext.*": {
+						"number_of_fragments":1,
+						"fragment_size":400
+					},
+					"citation.eprint.*": {
+						"number_of_fragments":1,
+						"fragment_size":10000
+					}
+				}
+			},
+			"_source": [
+				"id",
+				"fulltext.eprint.security",
+				"metadata.eprint.title",
+				"citation.eprint.es_title",
+				"citation.eprint.es_publication",
+				"citation.eprint.es_contributors"
+			],
+			"aggs":{},
+			"export_plugin_selected": "false",
+			"query": {
+				"bool": {
+					"must": [
+						{
+							"query_string": {
+								"query": suchstring,
+								"default_operator": "AND"
+							}
+						},
+						{
+							"nested": {
+								"path": "metadata.eprint.eprint_status",
+								"query": {
+									"bool": {
+										"must": [
+											{
+												"term": {
+													"metadata.eprint.eprint_status.key": "archive"
+												}
+											}
+										]
+									}
+								}
+							}
+						}
+					],
+					"filter": zora_filters
+				}
+			},
+			"size": count,
+			"from": start
+		}
 		response=requests.post(url=self.host+self.suchpfad, headers=self.headers, data=json.dumps(body))
 		if response.status_code >= 300:
 			return "http-response: "+str(response.status_code)
@@ -52,6 +188,4 @@ class Zora(Adapter):
 				'description': [zeile1, zeile2, zeile3],
 				'url': url
 			})
-		self.addcache(suchstring+'#',start,treffer,trefferliste)
-		# print("Ende Zora-Request")		
-		return
+		self.addcache(self.cachekey,start,treffer,trefferliste)

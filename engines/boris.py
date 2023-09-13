@@ -23,7 +23,6 @@ class Boris(Adapter):
 	}
 	host="https://boris.unibe.ch"
 	suchpfad="/cgi/search/archive/simple"
-	arguments="?screen=Search&order=&q={suchterm}&_action_search=Search&dataset=archive"
 	arguments="?exp=0|1||archive|-|q::ALL:IN:{suchterm}|-|&_action_search=1&order=&screen=Search&search_offset={start}"
 	dokumentpfad="/id/eprint/"
 	leerplatz=re.compile(r'[\n\r\s]+')
@@ -32,8 +31,24 @@ class Boris(Adapter):
 		super().__init__(self.name)
 
 	def request(self, suchstring, filters='', start=0, count=Adapter.LISTSIZE):
+		if filters:
+			for filter in filters:
+				if filter['id'] == 'discipline':
+					if 'unknown' not in filter['options']:
+						self.addcache(self.cachekey,start,0,[])
+						return 
+				elif filter['id'] == 'language':
+					if 'unknown' not in filter['options']:
+						self.addcache(self.cachekey,start,0,[])
+						return
+				elif filter['id'] == 'availability':
+					if 'unknown' not in filter['options']:
+						self.addcache(self.cachekey,start,0,[])
+						return
+				elif filter['id'] == 'date':
+					pass
+
 		# count is ignored here
-		print("Start Boris-Request für "+suchstring+" ab "+str(start))
 		urlsuchstring=urllib.parse.quote_plus(suchstring)
 		argumente=self.arguments.format(start=start, suchterm=urlsuchstring)
 		response=requests.get(url=self.host+self.suchpfad+argumente, headers=self.headers)
@@ -43,9 +58,7 @@ class Boris(Adapter):
 
 		trefferliste=[]
 		tree = lxml.html.fromstring(response.text)
-		# print(response.text)
 		ergebnis=tree.xpath("//div[@class='ep_search_controls']/div/text()[1]")
-		print(ergebnis[0])
 		if ergebnis[0]=='Search has no matches.':
 			trefferzahl=0
 		else:
@@ -53,7 +66,6 @@ class Boris(Adapter):
 			trefferzahl=int(counts[len(counts)-1])
 
 			for dokument in tree.xpath("//tr[@class='ep_search_result']"):
-				# print(tostring(dokument))
 				autor=dokument.xpath("(./td/span/text()|/td[span]/text())[not(preceding-sibling::a)]")
 				autors=""
 				for a in autor:
@@ -78,6 +90,5 @@ class Boris(Adapter):
 					'url': url
 				})
 
-		self.addcache(suchstring+'#',start,trefferzahl,trefferliste)
-		# print("Ende Boris-Request")		
+		self.addcache(self.cachekey,start,trefferzahl,trefferliste)
 		return

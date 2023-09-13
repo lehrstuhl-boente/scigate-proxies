@@ -20,13 +20,31 @@ class Repositorium(Adapter):
 		super().__init__(self.name)
 
 	def request(self, suchstring, filters='', start=0, count=Adapter.LISTSIZE):
-		print("request", suchstring, filters, start, count)
+		if filters:
+			for filter in filters:
+				if filter['id'] == 'discipline':
+					if 'law' not in filter['options']:
+						self.addcache(self.cachekey,start,0,[])
+						return
+				elif filter['id'] == 'language':
+					if 'unknown' not in filter['options']:
+						self.addcache(self.cachekey,start,0,[])
+						return
+				elif filter['id'] == 'availability':
+					if 'freeOnlineAvailable' not in filter['options']:
+						self.addcache(self.cachekey,start,0,[])
+						return
+				elif filter['id'] == 'date':
+					if filter['from'] != '' or filter['to'] != '':
+						self.addcache(self.cachekey,start,0,[])
+						return
+
 		urlsuchstring=urllib.parse.quote_plus(suchstring)
 		argumente = self.arguments.format(suchterm=urlsuchstring)
 		response=requests.get(url=self.host+self.suchpfad+argumente, headers=self.headers)
 
 		if response.status_code >= 300:
-			return "http-response: "+str(response.status_code)
+			return 'http-response: ' + str(response.status_code)
     
 		rs=json.loads(response.text)
 		treffer=len(rs)
@@ -40,7 +58,6 @@ class Repositorium(Adapter):
 			coauthorsArray = []
 			if coauthors is not None:
 				for author in coauthors:
-					print(json.dumps(author, sort_keys=True, indent=2))
 					coauthorsArray.append(author["coauthor_first"]+author["coauthor_last"])
 			else:
 				coauthorsArray.append("No Author Provided")
@@ -54,4 +71,4 @@ class Repositorium(Adapter):
 			})
 
 
-		self.addcache(suchstring+'#'+filters,start,treffer,trefferliste)
+		self.addcache(self.cachekey,start,treffer,trefferliste)

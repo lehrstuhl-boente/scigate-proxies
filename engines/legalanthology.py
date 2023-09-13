@@ -24,6 +24,24 @@ class Legalanthology(Adapter):
     super().__init__(self.name)
 
   def request(self, suchstring, filters='', start=0, count=Adapter.LISTSIZE):
+    if filters:
+      for filter in filters:
+        if filter['id'] == 'discipline':
+          if 'law' not in filter['options']:
+            self.addcache(self.cachekey,start,0,[])
+            return
+        elif filter['id'] == 'language':
+          if 'unknown' not in filter['options']:
+            self.addcache(self.cachekey,start,0,[])
+            return
+        elif filter['id'] == 'availability':
+          if 'freeOnlineAvailable' not in filter['options']:
+            self.addcache(self.cachekey,start,0,[])
+            return
+        elif filter['id'] == 'date':
+          if filter['from'] != '' or filter['to'] != '':
+            self.addcache(self.cachekey,start,0,[])
+            return
     # count is ignored here
     # starts at page 0, always 10 hits per page (first 10 hits on page 0, second 10 hits on page 1, ...)
     page = (int)(start/10)
@@ -42,8 +60,8 @@ class Legalanthology(Adapter):
     data = json.loads(result.group(1)) # extract JSON from return text
     treffer=data['full_results_count']
     trefferliste=[]
-    #print(json.dumps(data['results'], indent=2, default=str))
     for dokument in data['results']:
+      if type(dokument) == str: continue
       zeile1 = dokument['title']
       zeile2 = dokument['content']
       zeile3 = dokument['date']
@@ -52,4 +70,4 @@ class Legalanthology(Adapter):
         "description": [zeile1, zeile2, zeile3],
         "url": dokument['link']
       })
-    self.addcache(suchstring+'#'+filters,start,treffer,trefferliste)
+    self.addcache(self.cachekey,start,treffer,trefferliste)
