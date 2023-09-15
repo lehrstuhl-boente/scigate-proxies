@@ -3,6 +3,7 @@ import requests
 import json
 import urllib
 import re
+import datetime
 
 class Swisscovery(Adapter):
 	id="swisscovery"
@@ -60,7 +61,13 @@ class Swisscovery(Adapter):
 						self.addcache(self.cachekey,start,0,[])
 						return
 				elif filter['id'] == 'year':	# TODO: implement year filter
-					pass
+					filter_from = filter['from']
+					filter_to = filter['to']
+					if filter_from == '':
+						filter_from = 0
+					if filter_to == '':
+						filter_to = datetime.date.today().year
+					self.arguments += f'&multiFacets=facet_searchcreationdate,include,[{filter_from}+TO+{filter_to}]'
 
 		# count is only a recommendation
 		urlsuchstring=urllib.parse.quote_plus(suchstring)
