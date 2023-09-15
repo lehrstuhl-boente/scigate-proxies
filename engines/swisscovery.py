@@ -35,15 +35,16 @@ class Swisscovery(Adapter):
 		if filters:
 			for filter in filters:
 				if filter['id'] == 'discipline':
-					discipline_mappings = { 'law': 'Law' }
-					valid_option = False
+					discipline_mappings = { 'law': 'Recht' }
+					disciplines = []
 					for option in filter['options']:
 						if option not in discipline_mappings: continue
-						self.arguments += f'&multiFacets=facet_topic,include,{discipline_mappings[option]}'
-						valid_option = True
-					if not valid_option:
+						disciplines.append(f'facet_topic,include,{discipline_mappings[option]}')
+					if len(disciplines) == 0:
 						self.addcache(self.cachekey,start,0,[])
 						return
+					else:
+						self.arguments += '&multiFacets=' + '|,|'.join(disciplines)
 				elif filter['id'] == 'language':
 					language_mappings = { 'unknown': 'und', 'de': 'ger', 'fr': 'fre', 'en': 'eng', 'it': 'ita' }
 					languages = []
