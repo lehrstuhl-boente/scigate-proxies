@@ -34,7 +34,9 @@ class Swisscovery(Adapter):
 		if filters:
 			for filter in filters:
 				if filter['id'] == 'discipline':
-					pass
+					if 'unknown' not in filter['options']:
+						self.addcache(self.cachekey,start,0,[])
+						return
 				elif filter['id'] == 'language':
 					language_mappings = { 'unknown': 'und', 'de': 'ger', 'fr': 'fre', 'en': 'eng', 'it': 'ita' }
 					valid_option = False
