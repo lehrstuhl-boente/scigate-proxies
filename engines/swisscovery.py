@@ -46,14 +46,15 @@ class Swisscovery(Adapter):
 						return
 				elif filter['id'] == 'language':
 					language_mappings = { 'unknown': 'und', 'de': 'ger', 'fr': 'fre', 'en': 'eng', 'it': 'ita' }
-					valid_option = False
+					languages = []
 					for option in filter['options']:
 						if option not in language_mappings: continue
-						self.arguments += f'&multiFacets=facet_lang,include,{language_mappings[option]}'
-						valid_option = True
-					if not valid_option:
+						languages.append(f'facet_lang,include,{language_mappings[option]}')
+					if len(languages) == 0:
 						self.addcache(self.cachekey,start,0,[])
 						return
+					else:
+						self.arguments += '&multiFacets=' + '|,|'.join(languages)
 				elif filter['id'] == 'availability':
 					if 'freeOnlineAvailable' in filter['options']:
 						self.arguments += '&multiFacets=facet_tlevel,include,open_access'
