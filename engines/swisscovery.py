@@ -22,20 +22,29 @@ class Swisscovery(Adapter):
 	}
 	host="https://swisscovery.slsp.ch"
 	suchpfad="/primaws/rest/pub/pnxs"
-	arguments="?blendFacetsSeparately=false&disableCache=false&getMore=0&inst=41SLSP_NETWORK&lang=de&limit={count}&newspapersActive=false&newspapersSearch=false&offset={start}&pcAvailability=false&q=any,contains,{suchterm}&qExclude=&qInclude=&rapido=false&refEntryActive=true&rtaLinks=true&scope=DN_and_CI&searchInFulltextUserSelection=true&skipDelivery=Y&sort=rank&tab=41SLSP_NETWORK&vid=41SLSP_NETWORK:VU1_UNION"
+	#arguments="?blendFacetsSeparately=false&came_from=addFacet&citationTrailFilterByAvailability=true&disableCache=false&getMore=0&inst=41SLSP_NETWORK&lang=fr&limit={count}&multiFacets=facet_lang,include,ger&newspapersActive=false&newspapersSearch=false&offset={start}&pcAvailability=false&q=any,contains,{suchterm}&qExclude=&qInclude=&rapido=true&refEntryActive=true&rtaLinks=true&scope=DN_and_CI&searchInFulltextUserSelection=true&skipDelivery=Y&sort=rank&tab=41SLSP_NETWORK&vid=41SLSP_NETWORK:VU1_UNION"
+	arguments="?blendFacetsSeparately=false&citationTrailFilterByAvailability=true&disableCache=false&getMore=0&inst=41SLSP_NETWORK&lang=de&limit={count}&newspapersActive=false&newspapersSearch=false&offset={start}&pcAvailability=false&q=any,contains,{suchterm}&qExclude=&qInclude=&rapido=true&refEntryActive=true&rtaLinks=true&scope=DN_and_CI&searchInFulltextUserSelection=true&skipDelivery=Y&sort=rank&tab=41SLSP_NETWORK&vid=41SLSP_NETWORK:VU1_UNION"
 	dokumentpfad="/discovery/fulldisplay?docid={docid}&context={context}&vid=41SLSP_NETWORK:VU1_UNION&lang=de&search_scope=DN_and_CI&adaptor=Local%20Search%20Engine&tab=41SLSP_NETWORK"
 	reDoppelklammern=re.compile("(?:<<|>>)")
-	
+
 	def __init__(self):
 		super().__init__(self.name)
 
-	def request(self, suchstring, filters='', start=0,count=Adapter.LISTSIZE):
+	def request(self, suchstring, filters='', start=0, count=Adapter.LISTSIZE):
 		if filters:
 			for filter in filters:
 				if filter['id'] == 'discipline':
 					pass
 				elif filter['id'] == 'language':
-					pass
+					language_mappings = { 'unknown': 'und', 'de': 'ger', 'fr': 'fre', 'en': 'eng', 'it': 'ita' }
+					valid_option = False
+					for option in filter['options']:
+						if option not in language_mappings: continue
+						self.arguments += f'&multiFacets=facet_lang,include,{language_mappings[option]}'
+						valid_option = True
+					if not valid_option:
+						self.addcache(self.cachekey,start,0,[])
+						return
 				elif filter['id'] == 'availability':
 					pass
 				elif filter['id'] == 'year':	# TODO: implement year filter
