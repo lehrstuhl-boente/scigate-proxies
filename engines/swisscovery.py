@@ -46,7 +46,11 @@ class Swisscovery(Adapter):
 						self.addcache(self.cachekey,start,0,[])
 						return
 				elif filter['id'] == 'availability':
-					pass
+					if 'freeOnlineAvailable' in filter['options']:
+						self.arguments += '&multiFacets=facet_tlevel,include,open_access'
+					else:
+						self.addcache(self.cachekey,start,0,[])
+						return
 				elif filter['id'] == 'year':	# TODO: implement year filter
 					pass
 
