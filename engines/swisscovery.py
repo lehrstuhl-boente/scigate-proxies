@@ -37,6 +37,7 @@ class Swisscovery(Adapter):
 					discipline_mappings = { 'law': 'Law' }
 					valid_option = False
 					for option in filter['options']:
+						if option not in discipline_mappings: continue
 						self.arguments += f'&multiFacets=facet_topic,include,{discipline_mappings[option]}'
 						valid_option = True
 					if not valid_option:
