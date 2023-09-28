@@ -32,7 +32,7 @@ class Digitalisierungszentrum(Adapter):
           if 'freeOnlineAvailable' not in filter['options']:
             self.addcache(self.cachekey,start,0,[])
             return
-        elif filter['id'] == 'date':
+        elif filter['id'] == 'year':
           filter_from = str(filter['from']).zfill(4)
           filter_to = str(filter['to']).zfill(4)
           if filter['from'] == '':

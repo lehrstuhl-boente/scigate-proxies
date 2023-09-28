@@ -83,8 +83,8 @@ class Zora(Adapter):
 							'minimum_should_match': 1
 						}
 					})
-				elif filter['id'] == 'date':
-					date_filters = []
+				elif filter['id'] == 'year':
+					year_filters = []
 					filter_from = filter['from']
 					filter_to = filter['to']
 					if filter_from == '':
@@ -92,10 +92,10 @@ class Zora(Adapter):
 					if filter_to == '':
 						filter_to = datetime.date.today().year
 					for year in range(filter_from, filter_to+1):
-						date_filters.append({ 'term': { 'agg_pubyear_key': str(year) } })
+						year_filters.append({ 'term': { 'agg_pubyear_key': str(year) } })
 					zora_filters.append({
 						'bool': {
-							'should': date_filters,
+							'should': year_filters,
 							'minimum_should_match': 1
 						}
 					})

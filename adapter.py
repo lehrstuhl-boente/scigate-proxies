@@ -58,9 +58,9 @@ class Adapter():
 				if len(formatted_options) > 0:	# only consider filter when at least one checkbox is checked
 					filter['options'] = formatted_options
 					formatted_filters.append(filter)
-			elif filter['type'] == 'date':
+			elif filter['type'] == 'year':
 				if filter['from'] != '' or filter['to'] != '':
-					formatted_filters.append(filter)	# don't add date filter if values are empty
+					formatted_filters.append(filter)	# don't add year filter if values are empty
 			elif filter['type'] == 'switch':
 				pass	# TODO: implmement when first switch is in frontend
 		return formatted_filters
@@ -70,7 +70,7 @@ class Adapter():
 		for filter in filters:
 			if filter['type'] == 'checkbox':
 				stringified_filters.append(filter['id'] + '=' + ','.join(filter['options']))
-			elif filter['type'] == 'date':
+			elif filter['type'] == 'year':
 				stringified_filters.append('from=' + str(filter['from']) + '&to=' + str(filter['to']))
 		return suchstring + '#' + '&'.join(stringified_filters)
 
