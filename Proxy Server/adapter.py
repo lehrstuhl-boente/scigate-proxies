@@ -5,6 +5,8 @@ import json
 
 class Adapter():
 	LISTSIZE=20
+	TIMEOUT=86000
+	LastGarbage=datetime.datetime.now();
 	#Boris kann nichts anderes, da her wird das generell gesetzt.
 	name="unknown"
 	adapters={}
@@ -48,7 +50,7 @@ class Adapter():
 	def suche(self, suchstring, filter):
 		cachekey=suchstring+'#'+filter
 		if cachekey in self.cache:
-			if (datetime.datetime.now()-self.cache[cachekey].zeit).total_seconds()<86000:
+			if (datetime.datetime.now()-self.cache[cachekey].zeit).total_seconds()<self.TIMEOUT:
 				return "ok", "", self.cache[cachekey].trefferzahl
 			else:
 				del self.cache[cachekey]
@@ -62,7 +64,7 @@ class Adapter():
 	def treffer(self, suchstring, filter, von=0,zahl=10):
 		cachekey=suchstring+'#'+filter
 		if cachekey in self.cache:
-			if (datetime.datetime.now()-self.cache[cachekey].zeit).total_seconds()>86000:
+			if (datetime.datetime.now()-self.cache[cachekey].zeit).total_seconds()>self.TIMEOUT:
 				del self.cache[cachekey]				
 				fehler=self.request(suchstring, filter, von, min(self.LISTSIZE,zahl))
 				if fehler:
@@ -95,16 +97,28 @@ class Adapter():
 						
 	def addcache(self, cachekey, start,treffer,trefferliste):
 		print("Addcache ab "+str(start)+" mit "+str(len(trefferliste))+" Treffern in der Liste.")
+		self.garbageCollection()
 		if cachekey in self.cache:
-			if self.cache[cachekey].update(cachekey, treffer, trefferliste, start):
+			if not self.cache[cachekey].update(cachekey, treffer, trefferliste, start):
 				del self.cache[cachekey]
 		if not cachekey in self.cache:
 			self.cache[cachekey]=Cacheeintrag(cachekey, treffer, trefferliste, start)
+	
+	# Prüfe ob Garbage Collection fällig ist und führe diese dann ggf. durch
+	def garbageCollection(self):
+		n=datetime.datetime.now()
+		if (n-self.LastGarbage).total_seconds()>self.TIMEOUT:
+			for i in self.cache:
+				if (n-i.zeit).total_seconds()>self.TIMEOUT:
+					del self.cache[i]
+		self.LastGarbage=n	
+	
 	
 	def request(self, suche, von=0):
 		return "not implemented"
 
 class Cacheeintrag():
+	TIMEOUT=86000
 
 	def __init__(self, suche, trefferzahl, trefferliste, start=0):
 		self.suche=suche
@@ -123,7 +137,7 @@ class Cacheeintrag():
 			return False
 		aktzeit=datetime.datetime.now()
 		diff=(aktzeit-self.zeit).total_seconds()
-		if diff>86000:
+		if diff>self.TIMEOUT:
 			return false
 		for i in trefferliste:
 			self.trefferliste[start]=copy.deepcopy(i)
